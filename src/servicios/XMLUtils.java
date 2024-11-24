@@ -172,7 +172,13 @@ public class XMLUtils {
                 cuentaElement.appendChild(identificacion);
 
                 Element pin = doc.createElement("pin");
-                pin.appendChild(doc.createTextNode(cuenta.getPin()));
+                String pinEncriptado = "";
+                try {
+                    pinEncriptado = CryptoUtils.encriptar(cuenta.getPin());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                pin.appendChild(doc.createTextNode(pinEncriptado));
                 cuentaElement.appendChild(pin);
             }
 
@@ -212,7 +218,13 @@ public class XMLUtils {
                     String estatus = getTagValue("estatus", elementoCuenta);
                     String saldoFormateado = getTagValue("saldo", elementoCuenta).replace(",", ".");
                     double saldo = saldoFormateado.isEmpty() ? 0.0 : Double.parseDouble(saldoFormateado);
-                    String pin = getTagValue("pin", elementoCuenta);
+                    String pinEncriptado = getTagValue("pin", elementoCuenta);
+                    String pin = "";
+                    try {
+                        pin = CryptoUtils.desencriptar(pinEncriptado);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     String identificacionStr = getTagValue("identificacion", elementoCuenta);
                     int identificacion = identificacionStr.isEmpty() ? -1 : Integer.parseInt(identificacionStr);

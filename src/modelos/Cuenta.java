@@ -19,8 +19,9 @@ public class Cuenta implements Comparable<Cuenta> {
     private double sumaRetiros = 0; // Verificar uso
     public int cantidadTransacciones = 0; // Contador de transacciones para cada cuenta
 
-    public Cuenta(double saldo, String codigo, String pin, Cliente cliente) {
-        this.codigo = "cta-" + cantidadCuentas++;
+    public Cuenta(double saldo, String pin, Cliente cliente) {
+        this.codigo = "cta-" + String.valueOf(Cliente.getCantidadCuentasDelSistema() + 1);
+        Cliente.setCantidadCuentasDelSistema(Cliente.getCantidadCuentasDelSistema() + 1);
         this.saldo = saldo;
         this.pin = pin;
         this.miCliente = cliente;
@@ -30,7 +31,7 @@ public class Cuenta implements Comparable<Cuenta> {
     }
 
     public Cuenta(double saldo, String codigo, String pin, Cliente cliente, String estatus) {
-        this(saldo, codigo, pin, cliente);
+        this(saldo, pin, cliente);
         this.estatus = estatus;
     }
 
@@ -39,14 +40,20 @@ public class Cuenta implements Comparable<Cuenta> {
     }
 
     public void agregarTransaccion(String tipo, double monto) {
-        Transaccion transaccion = new Transaccion(tipo, monto, codigo, cantidadTransacciones);
-        transacciones.add(transaccion);
         cantidadTransacciones++;
+        Transaccion transaccion;
+        if ((tipo.equalsIgnoreCase("deposito") || tipo.equalsIgnoreCase("retiro")) && cantidadTransacciones > 5) {
+            monto += Transaccion.calcularComision(monto, cantidadTransacciones);
+            transaccion = new Transaccion(tipo, monto, codigo, true);
+        } else {
+            transaccion = new Transaccion(tipo, monto, codigo, false);
+        }
+        transacciones.add(transaccion);
 
         if (tipo.equalsIgnoreCase("deposito")) {
             saldo += monto;
-        } else if (tipo.equalsIgnoreCase("retiro")) {
-            saldo -= monto + transaccion.getMontoComision(); // Aplicar comisión si existe
+        } else {
+            saldo -= monto;
         }
     }
 

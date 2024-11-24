@@ -15,12 +15,18 @@ import servicios.PersistenciaDatos;
 public class ClienteControlador {
 
     private List<Cliente> clientes;
+    private CuentaControlador cuentaControlador;
 
     public ClienteControlador() {
-        this.clientes = PersistenciaDatos.cargarClientes();
+        this.clientes = null;
         if (clientes == null) {
             clientes = new ArrayList<>();
         }
+        this.cuentaControlador = new CuentaControlador(clientes);
+    }
+
+    public CuentaControlador getCuentaControlador() {
+        return cuentaControlador;
     }
 
     public boolean crearClienteFisico(String nombre, long identificacion, String numTelefono, String correoElectronico,
@@ -72,6 +78,10 @@ public class ClienteControlador {
 
     public List<Cliente> obtenerClientes() {
         return clientes;
+    }
+
+    public void setClientes(List<Cliente> clientes) {
+        this.clientes = clientes;
     }
 
     public boolean actualizarTelefono(long identificacion, String nuevoTelefono) {

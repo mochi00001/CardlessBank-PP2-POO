@@ -5,7 +5,7 @@
         <maxCuentas>3</maxCuentas>
         <nombre>Juan Perez</nombre>
         <identificacion>123456789</identificacion>
-        <numTelefono>123456789</numTelefono>
+        <numTelefono>89655235</numTelefono>
         <correoElectronico>juanperez@email.com</correoElectronico>
     </cliente>
     <cliente tipo="juridico">
@@ -79,5 +79,13 @@
         <identificacion>105190222</identificacion>
         <numTelefono>72565235</numTelefono>
         <correoElectronico>yoinerVega@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="fisico">
+        <fechaNacimiento>2004-10-20</fechaNacimiento>
+        <maxCuentas>4</maxCuentas>
+        <nombre>Nia Rojas</nombre>
+        <identificacion>205440233</identificacion>
+        <numTelefono>89655235</numTelefono>
+        <correoElectronico>niaRojas@gmail.com</correoElectronico>
     </cliente>
 </clientes>

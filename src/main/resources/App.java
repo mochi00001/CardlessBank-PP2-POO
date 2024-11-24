@@ -17,29 +17,24 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import controladores.ClienteControlador;
-import controladores.CuentaControlador;
-import controladores.TransaccionesControlador;
 import modelos.Cliente;
 import modelos.Cuenta;
 import modelos.Transaccion;
 import servicios.LocalDateAdapter;
+import servicios.PersistenciaDatos;
 import servicios.TipoDeCambioBCCR;
 
 public class App {
 
     public static void main(String[] args) {
         ClienteControlador clienteControlador = new ClienteControlador();
-        CuentaControlador cuentaControlador = new CuentaControlador(clienteControlador);
-        TransaccionesControlador transaccionesControlador = new TransaccionesControlador(cuentaControlador);
+        PersistenciaDatos.cargarDatos(clienteControlador);
         TipoDeCambioBCCR.obtenerTipoCambioHoy();
         // Llamar al método para iniciar el servidor
-        iniciarServidor(clienteControlador, cuentaControlador, transaccionesControlador);
+        iniciarServidor(clienteControlador);
     }
 
-    private static void iniciarServidor(
-            ClienteControlador clienteControlador,
-            CuentaControlador cuentaControlador,
-            TransaccionesControlador transaccionesControlador) {
+    private static void iniciarServidor(ClienteControlador clienteControlador) {
 
         // Configurar el puerto (por defecto es 4567)
         port(4567);
@@ -56,16 +51,16 @@ public class App {
                 .create();
 
         // Definir los endpoints
-        definirEndpoints(clienteControlador, cuentaControlador, transaccionesControlador, gson);
+        definirEndpoints(clienteControlador, gson);
 
     }
 
     private static void definirEndpoints(
             ClienteControlador clienteControlador,
-            CuentaControlador cuentaControlador,
-            TransaccionesControlador transaccionesControlador,
             Gson gson) {
 
+        List<Cliente> clientes = new ArrayList<>();
+        clientes = clienteControlador.obtenerClientes();
         // Manejar solicitudes OPTIONS para CORS preflight
         options("/*", (request, response) -> {
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -334,12 +329,11 @@ public class App {
             }
 
             Cliente cliente = clienteOpt.get();
-
-            // System.out.println("Creando la cuenta");
             // Crear la cuenta
-            String cuentaCreada = cuentaControlador.crearCuenta(data.saldoInicial, data.pin, cliente);
-            // System.out.println("Cuenta creada: " + cuentaCreada);
-            if (cuentaCreada != null) {
+            Cuenta cuenta = new Cuenta(data.saldoInicial, data.pin, cliente);
+            boolean cuentaCreada = clienteControlador.agregarCuentaACliente(id, cuenta);
+
+            if (cuentaCreada) {
                 String mensaje = String.format(
                         "Se ha creado una nueva cuenta en el sistema.\nNúmero de cuenta: %s\nEstatus de la cuenta: Activa\nSaldo actual: %.2f colones\nTipo de cliente: %s\nNombre del dueño o apoderado generalísimo de la cuenta: %s",
                         cuentaCreada, data.saldoInicial, cliente.getTipo(), cliente.getNombre());
@@ -357,7 +351,7 @@ public class App {
             res.type("application/json");
             String numeroCuenta = req.params(":numeroCuenta");
 
-            Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
+            Optional<Cuenta> cuentaOpt = clienteControlador.getCuentaControlador().obtenerCuentaPorNumero(numeroCuenta);
             // System.out.println("Validando cuenta: " + cuentaOpt.get().getCodigo());
             if (cuentaOpt.isPresent()) {
                 Cuenta cuenta = cuentaOpt.get();
@@ -391,7 +385,8 @@ public class App {
             }
 
             // Buscar la cuenta
-            Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(data.numeroCuenta);
+            Optional<Cuenta> cuentaOpt = clienteControlador.getCuentaControlador()
+                    .obtenerCuentaPorNumero(data.numeroCuenta);
             if (!cuentaOpt.isPresent()) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, "La cuenta no existe."));
             }
@@ -404,7 +399,7 @@ public class App {
             }
 
             // Cambiar el PIN
-            boolean cambiado = cuentaControlador.cambiarPinCuenta(cuenta, data.nuevoPin);
+            boolean cambiado = clienteControlador.getCuentaControlador().cambiarPinCuenta(cuenta, data.nuevoPin);
             if (cambiado) {
                 String mensaje = String.format(
                         "Estimado usuario: %s, le informamos que se ha cambiado satisfactoriamente el PIN de su cuenta %s.",
@@ -424,7 +419,7 @@ public class App {
             String numeroCuenta = req.params(":numeroCuenta");
             String pin = req.params(":pin");
 
-            Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
+            Optional<Cuenta> cuentaOpt = clienteControlador.getCuentaControlador().obtenerCuentaPorNumero(numeroCuenta);
             if (cuentaOpt.isPresent()) {
                 Cuenta cuenta = cuentaOpt.get();
                 if (cuenta.verificarPin(pin)) {
@@ -447,12 +442,12 @@ public class App {
             res.type("application/json");
             String numeroCuenta = req.params(":numeroCuenta");
 
-            Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
+            Optional<Cuenta> cuentaOpt = clienteControlador.getCuentaControlador().obtenerCuentaPorNumero(numeroCuenta);
             if (cuentaOpt.isPresent()) {
                 Cuenta cuenta = cuentaOpt.get();
                 double saldo = cuenta.getSaldo(); // Guardamos el saldo antes de eliminar
 
-                boolean eliminada = cuentaControlador.eliminarCuenta(numeroCuenta);
+                boolean eliminada = clienteControlador.getCuentaControlador().eliminarCuenta(numeroCuenta);
                 if (eliminada) {
                     Map<String, Object> cuentaData = new HashMap<>();
                     cuentaData.put("saldo", saldo);
@@ -473,8 +468,9 @@ public class App {
         post("/transacciones/depositoColones", (req, res) -> {
             res.type("application/json");
             TransaccionRequest request = gson.fromJson(req.body(), TransaccionRequest.class);
-            String resultado = transaccionesControlador.realizarDepositoColones(request.getNumeroCuenta(),
-                    request.getMonto());
+            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .realizarDepositoColones(request.getNumeroCuenta(),
+                            request.getMonto());
             if (resultado.startsWith("Error")) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, resultado));
             } else {
@@ -487,8 +483,9 @@ public class App {
         post("/transacciones/depositoDolares", (req, res) -> {
             res.type("application/json");
             TransaccionRequest request = gson.fromJson(req.body(), TransaccionRequest.class);
-            String resultado = transaccionesControlador.realizarDepositoDolares(request.getNumeroCuenta(),
-                    request.getMonto());
+            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .realizarDepositoDolares(request.getNumeroCuenta(),
+                            request.getMonto());
             if (resultado.startsWith("Error")) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, resultado));
             } else {
@@ -505,7 +502,8 @@ public class App {
             String numeroCuenta = req.params(":numeroCuenta");
             String pin = req.params(":pin");
 
-            boolean esValido = transaccionesControlador.validarPinCuenta(numeroCuenta, pin);
+            boolean esValido = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .validarPinCuenta(numeroCuenta, pin);
 
             if (esValido) {
                 return gson.toJson(new StandardResponse(StatusResponse.SUCCESS, "Cuenta y PIN válidos."));
@@ -520,7 +518,8 @@ public class App {
             res.type("application/json");
             String numeroCuenta = req.params(":numeroCuenta");
 
-            String palabraGenerada = transaccionesControlador.enviarPalabraVerificacion(numeroCuenta);
+            String palabraGenerada = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .enviarPalabraVerificacion(numeroCuenta);
 
             if (palabraGenerada != null) {
                 return gson.toJson(new StandardResponse(StatusResponse.SUCCESS, "Palabra clave enviada."));
@@ -534,7 +533,8 @@ public class App {
             res.type("application/json");
             String palabraIngresada = req.params(":palabraIngresada");
 
-            boolean esValida = transaccionesControlador.validarPalabraClave(palabraIngresada);
+            boolean esValida = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .validarPalabraClave(palabraIngresada);
 
             if (esValida) {
                 return gson.toJson(new StandardResponse(StatusResponse.SUCCESS, "Palabra clave válida."));
@@ -548,11 +548,12 @@ public class App {
         post("/transacciones/retiroColones", (req, res) -> {
             res.type("application/json");
             RetiroRequest request = gson.fromJson(req.body(), RetiroRequest.class);
-            String resultado = transaccionesControlador.realizarRetiroEnColones(
-                    request.getNumeroCuenta(),
-                    request.getPin(),
-                    request.getPalabraIngresada(),
-                    request.getMontoRetiro());
+            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .realizarRetiroEnColones(
+                            request.getNumeroCuenta(),
+                            request.getPin(),
+                            request.getPalabraIngresada(),
+                            request.getMontoRetiro());
             if (resultado.startsWith("Error")) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, resultado));
             } else {
@@ -566,11 +567,12 @@ public class App {
         post("/transacciones/retiroDolares", (req, res) -> {
             res.type("application/json");
             RetiroRequest request = gson.fromJson(req.body(), RetiroRequest.class);
-            String resultado = transaccionesControlador.realizarRetiroEnDolares(
-                    request.getNumeroCuenta(),
-                    request.getPin(),
-                    request.getPalabraIngresada(),
-                    request.getMontoRetiro());
+            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .realizarRetiroEnDolares(
+                            request.getNumeroCuenta(),
+                            request.getPin(),
+                            request.getPalabraIngresada(),
+                            request.getMontoRetiro());
             if (resultado.startsWith("Error")) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, resultado));
             } else {
@@ -586,7 +588,8 @@ public class App {
             String numeroCuentaOrigen = req.params(":numeroCuentaOrigen");
             String numeroCuentaDestino = req.params(":numeroCuentaDestino");
 
-            String resultado = transaccionesControlador.validarCuentaDestino(numeroCuentaOrigen, numeroCuentaDestino);
+            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .validarCuentaDestino(numeroCuentaOrigen, numeroCuentaDestino);
 
             if (resultado.equals("SUCCESS")) {
                 return gson.toJson(
@@ -600,11 +603,12 @@ public class App {
         post("/transacciones/transferencia", (req, res) -> {
             res.type("application/json");
             TransferenciaRequest request = gson.fromJson(req.body(), TransferenciaRequest.class);
-            String resultado = transaccionesControlador.realizarTransferencia(
-                    request.getNumeroCuentaOrigen(),
-                    request.getPinCuentaOrigen(),
-                    request.getNumeroCuentaDestino(),
-                    request.getMontoTransferencia());
+            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .realizarTransferencia(
+                            request.getNumeroCuentaOrigen(),
+                            request.getPinCuentaOrigen(),
+                            request.getNumeroCuentaDestino(),
+                            request.getMontoTransferencia());
             if (resultado.startsWith("Error")) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, resultado));
             } else {
@@ -626,18 +630,21 @@ public class App {
             String palabraIngresada = request.getPalabraIngresada();
 
             // Validar PIN y palabra clave
-            boolean esCuentaValida = transaccionesControlador.validarPinCuenta(numeroCuenta, pin);
+            boolean esCuentaValida = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .validarPinCuenta(numeroCuenta, pin);
             if (!esCuentaValida) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, "Número de cuenta o PIN incorrectos."));
             }
 
-            boolean esPalabraClaveValida = transaccionesControlador.validarPalabraClave(palabraIngresada);
+            boolean esPalabraClaveValida = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .validarPalabraClave(palabraIngresada);
             if (!esPalabraClaveValida) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, "La palabra ingresada no coincide."));
             }
 
             // Obtener las transacciones
-            List<Transaccion> transacciones = transaccionesControlador.obtenerTransaccionesPorCuenta(numeroCuenta);
+            List<Transaccion> transacciones = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+                    .obtenerTransaccionesPorCuenta(numeroCuenta);
 
             // Preparar datos de respuesta
             List<Map<String, Object>> transaccionesData = new ArrayList<>();
@@ -646,24 +653,23 @@ public class App {
                 transaccionData.put("tipo", transaccion.getTipo());
                 transaccionData.put("monto", transaccion.getMonto());
                 transaccionData.put("fecha", transaccion.getFecha().toString());
-                transaccionData.put("comision", transaccion.isComision());
+                transaccionData.put("comision", transaccion.getComision());
                 transaccionesData.add(transaccionData);
             }
 
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("transacciones", transaccionesData);
 
-            return gson.toJson(new StandardResponse(StatusResponse.SUCCESS, "Consulta de transacciones exitosa.", respuesta));
+            return gson.toJson(
+                    new StandardResponse(StatusResponse.SUCCESS, "Consulta de transacciones exitosa.", respuesta));
         });
-
 
         // 2. Consultar tipo de cambio de compra
         // Endpoint para obtener el tipo de cambio de compra
         get("/tipoCambio/compra", (req, res) -> {
             res.type("application/json");
-            TipoDeCambioBCCR.obtenerTipoCambioHoy(); // Asegura que se obtengan los datos más recientes
-            double tipoCambioCompra = TipoDeCambioBCCR.obtenerTipoCambioCompra();
-            String fecha = TipoDeCambioBCCR.obtenerFechaTipoCambioHoy();
+            double tipoCambioCompra = TipoDeCambioBCCR.getTipoCambioCompra();
+            String fecha = TipoDeCambioBCCR.getFechaTipoCambioHoy();
             TipoCambioData data = new TipoCambioData(tipoCambioCompra, fecha);
             return gson.toJson(new StandardResponse(StatusResponse.SUCCESS, gson.toJsonTree(data)));
         });
@@ -671,9 +677,8 @@ public class App {
         // Endpoint para obtener el tipo de cambio de venta
         get("/tipoCambio/venta", (req, res) -> {
             res.type("application/json");
-            TipoDeCambioBCCR.obtenerTipoCambioHoy(); // Asegura que se obtengan los datos más recientes
-            double tipoCambioVenta = TipoDeCambioBCCR.obtenerTipoCambioVenta();
-            String fecha = TipoDeCambioBCCR.obtenerFechaTipoCambioHoy();
+            double tipoCambioVenta = TipoDeCambioBCCR.getTipoCambioVenta();
+            String fecha = TipoDeCambioBCCR.getFechaTipoCambioHoy();
             TipoCambioData data = new TipoCambioData(tipoCambioVenta, fecha);
             return gson.toJson(new StandardResponse(StatusResponse.SUCCESS, gson.toJsonTree(data)));
         });
@@ -685,7 +690,8 @@ public class App {
             String numeroCuenta = req.params(":numeroCuenta");
             String pin = req.params(":pin");
 
-            String resultado = cuentaControlador.consultarSaldoDivisaExtranjera(numeroCuenta, pin);
+            String resultado = clienteControlador.getCuentaControlador().consultarSaldoDivisaExtranjera(numeroCuenta,
+                    pin);
 
             if (resultado == null) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR,
@@ -701,7 +707,7 @@ public class App {
             String numeroCuenta = req.params(":numeroCuenta");
             String pin = req.params(":pin");
 
-            Map<String, Object> resultado = cuentaControlador.estadoCuenta(numeroCuenta, pin);
+            Map<String, Object> resultado = clienteControlador.getCuentaControlador().estadoCuenta(numeroCuenta, pin);
 
             if (resultado.containsKey("error")) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, (String) resultado.get("error")));
@@ -715,7 +721,20 @@ public class App {
             res.type("application/json");
             String numeroCuenta = req.params(":numeroCuenta");
 
-            String resultado = cuentaControlador.consultarEstatusCuenta(numeroCuenta);
+            Cuenta cuentaConsulta = null;
+            for (Cliente cliente : clienteControlador.obtenerClientes()) {
+                for (Cuenta cuenta : cliente.getMisCuentas()) {
+                    if (cuenta.getCodigo().equals(numeroCuenta)) {
+                        cuentaConsulta = cuenta;
+                        break;
+                    }
+                }
+                if (cuentaConsulta != null) {
+                    break;
+                }
+
+            }
+            String resultado = cuentaConsulta.getEstatus();
 
             if (resultado.startsWith("Error:")) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, resultado));
@@ -779,7 +798,14 @@ public class App {
         get("/cuentas/listar", (req, res) -> {
             res.type("application/json");
             // Obtener la lista de cuentas del controlador
-            List<Cuenta> cuentas = cuentaControlador.getCuentas();
+            List<Cuenta> cuentas = new ArrayList<>();
+
+            for (Cliente cliente : clienteControlador.obtenerClientes()) {
+                if (cliente.getMisCuentas() != null) {
+                    cuentas.addAll(cliente.getMisCuentas());
+                }
+
+            }
             // Ordenar las cuentas por saldo ascendente
             cuentas.sort(Comparator.comparingDouble(Cuenta::getSaldo));
 
@@ -939,33 +965,33 @@ public class App {
         private String numeroCuenta;
         private String pin;
         private String palabraIngresada;
-    
+
         // Getters y setters
         public String getNumeroCuenta() {
             return numeroCuenta;
         }
-    
+
         public void setNumeroCuenta(String numeroCuenta) {
             this.numeroCuenta = numeroCuenta;
         }
-    
+
         public String getPin() {
             return pin;
         }
-    
+
         public void setPin(String pin) {
             this.pin = pin;
         }
-    
+
         public String getPalabraIngresada() {
             return palabraIngresada;
         }
-    
+
         public void setPalabraIngresada(String palabraIngresada) {
             this.palabraIngresada = palabraIngresada;
         }
     }
-    
+
     public class TransaccionRequest {
         private String numeroCuenta;
         private int monto;

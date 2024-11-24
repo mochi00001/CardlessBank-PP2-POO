@@ -2,8 +2,8 @@ package controladores;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+import modelos.Cliente;
 import modelos.Cuenta;
 import modelos.Transaccion;
 import servicios.MensajeSMS;
@@ -12,28 +12,22 @@ import servicios.TipoDeCambioBCCR;
 
 public class TransaccionesControlador {
 
-    private CuentaControlador cuentaControlador;
-    private List<Transaccion> transacciones;
+    private List<Cliente> clientes;
     private String palabraGenerada;
 
-    public TransaccionesControlador(CuentaControlador cuentaControlador) {
-        this.cuentaControlador = cuentaControlador;
-        this.transacciones = new ArrayList<>();
-        cargarTransacciones();
-    }
-
-    private void cargarTransacciones() {
-        List<Transaccion> transaccionesDesdeArchivo = PersistenciaDatos.cargarTransacciones();
-        transaccionesDesdeArchivo.stream()
-                .filter(t -> cuentaControlador.obtenerCuentaPorNumero(t.getCodigoCuenta()).isPresent())
-                .forEach(transacciones::add);
+    public TransaccionesControlador(List<Cliente> clientes) {
+        this.clientes = clientes;
     }
 
     public List<Transaccion> obtenerTransaccionesPorCuenta(String numeroCuenta) {
-        List<Transaccion> transaccionesPorCuenta = new ArrayList<>();
-        for (Transaccion transaccion : transacciones) {
-            if (transaccion.getCodigoCuenta().equals(numeroCuenta)) {
-                transaccionesPorCuenta.add(transaccion);
+        List<Transaccion> transaccionesPorCuenta;
+        transaccionesPorCuenta = new ArrayList<>();
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuenta)) {
+                    transaccionesPorCuenta = cuenta.getTransacciones();
+                    break;
+                }
             }
         }
         return transaccionesPorCuenta;
@@ -42,17 +36,14 @@ public class TransaccionesControlador {
     private void actualizarSaldo(Cuenta cuenta, double monto) {
         double nuevoSaldo = cuenta.getSaldo() + monto;
         cuenta.setSaldo(nuevoSaldo);
-        List<Cuenta> cuentasList = cuentaControlador.getCuentas();
-        PersistenciaDatos.guardarCuentas(cuentasList);
+        PersistenciaDatos.guardarDatos(clientes);
     }
 
     private void actualizarSaldoRetiro(Cuenta cuenta, double monto) {
         if (monto > 0 && monto <= cuenta.getSaldo()) {
             double nuevoSaldo = cuenta.getSaldo() - monto;
             cuenta.setSaldo(nuevoSaldo);
-
-            List<Cuenta> cuentasList = cuentaControlador.getCuentas();
-            PersistenciaDatos.guardarCuentas(cuentasList);
+            PersistenciaDatos.guardarDatos(clientes);
         } else {
             throw new IllegalArgumentException("El monto debe ser positivo y no puede exceder el saldo actual.");
         }
@@ -66,21 +57,29 @@ public class TransaccionesControlador {
             return "Error: El monto debe ser mayor a cero.";
         }
 
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        if (!cuentaOpt.isPresent()) {
+        Cuenta cuenta = null;
+        for (Cliente cliente : clientes) {
+            for (Cuenta c : cliente.getMisCuentas()) {
+                if (c.getCodigo().equals(numeroCuenta)) {
+                    cuenta = c;
+                    break;
+                }
+            }
+            if (cuenta != null) {
+                break;
+            }
+        }
+
+        if (cuenta == null) {
             return "Error: No se encontró la cuenta.";
         }
-        Cuenta cuenta = cuentaOpt.get();
-
         Transaccion transaccion = new Transaccion("Depósito en Colones", monto, numeroCuenta,
-                cuenta.getTransacciones().size());
+                true);
         cuenta.agregarTransaccion(transaccion);
-
-        double comision = (cuenta.cantidadTransacciones >= 5) ? transaccion.getMontoComision() : 0;
-        double montoRealDepositado = monto - comision;
+        double montoRealDepositado = monto - transaccion.getMontoComision();
 
         actualizarSaldo(cuenta, montoRealDepositado);
-        PersistenciaDatos.guardarCuentas(cuentaControlador.getCuentas());
+        PersistenciaDatos.guardarDatos(clientes);
 
         registrarTransaccion("Depósito en Colones", monto, numeroCuenta, montoRealDepositado, cuenta);
         return String.format("Depósito realizado exitosamente de %d colones.\n\n" +
@@ -89,33 +88,36 @@ public class TransaccionesControlador {
                 monto,
                 numeroCuenta,
                 montoRealDepositado,
-                comision);
+                transaccion.getMontoComision());
     }
 
     public String realizarDepositoDolares(String numeroCuenta, double montoUSD) {
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        if (!cuentaOpt.isPresent()) {
-            return "Error: Número de cuenta no registrado.";
-        }
-        Cuenta cuenta = cuentaOpt.get();
 
+        Cuenta cuenta = null;
+
+        for (Cliente cliente : clientes) {
+            for (Cuenta c : cliente.getMisCuentas()) {
+                if (c.getCodigo().equals(numeroCuenta)) {
+                    cuenta = c;
+                    break;
+                }
+            }
+        }
         if (montoUSD <= 0 || montoUSD % 1 != 0) {
             return "Error: El monto debe ser un número entero mayor a cero.";
         }
 
-        double tipoCambio = TipoDeCambioBCCR.obtenerTipoCambioCompra();
+        double tipoCambio = TipoDeCambioBCCR.getTipoCambioCompra();
         double montoColones = montoUSD * tipoCambio;
 
         // Crear y agregar la transacción, incluyendo el cálculo de la comisión
         Transaccion transaccion = new Transaccion("Depósito en Dólares", montoColones, numeroCuenta,
-                cuenta.getTransacciones().size());
+                true);
         cuenta.agregarTransaccion(transaccion);
-
-        double comision = (cuenta.cantidadTransacciones >= 5) ? transaccion.getMontoComision() : 0;
-        double montoRealDepositado = montoColones - comision;
+        double montoRealDepositado = montoColones - transaccion.getMontoComision();
 
         actualizarSaldo(cuenta, montoRealDepositado);
-        PersistenciaDatos.guardarCuentas(cuentaControlador.getCuentas());
+        PersistenciaDatos.guardarDatos(clientes);
 
         registrarTransaccion("Depósito en Dólares", montoColones, numeroCuenta, montoRealDepositado, cuenta);
         return String.format("Depósito realizado exitosamente de %.2f dólares.\n\n" +
@@ -128,12 +130,20 @@ public class TransaccionesControlador {
     }
 
     public String enviarPalabraVerificacion(String numeroCuenta) {
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        if (!cuentaOpt.isPresent()) {
-            return null; // Devolvemos null si la cuenta no está registrada
-        }
 
-        Cuenta cuenta = cuentaOpt.get();
+        Cuenta cuenta = null;
+
+        for (Cliente cliente : clientes) {
+            for (Cuenta c : cliente.getMisCuentas()) {
+                if (c.getCodigo().equals(numeroCuenta)) {
+                    cuenta = c;
+                    break;
+                }
+            }
+            if (cuenta != null) {
+                break;
+            }
+        }
         MensajeSMS mensajeSMS = new MensajeSMS();
         this.palabraGenerada = mensajeSMS.generarPalabraVerificacion();
 
@@ -164,11 +174,20 @@ public class TransaccionesControlador {
 
     public String realizarRetiroEnColones(String numeroCuenta, String pin, String palabraIngresada,
             double montoRetiro) {
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        if (!cuentaOpt.isPresent()) {
-            return "Error: Número de cuenta no registrado.";
+
+        Cuenta cuenta = null;
+        for (Cliente cliente : clientes) {
+            for (Cuenta c : cliente.getMisCuentas()) {
+                if (c.getCodigo().equals(numeroCuenta)) {
+                    cuenta = c;
+                    break;
+                }
+            }
+            if (cuenta != null) {
+                break;
+            }
         }
-        Cuenta cuenta = cuentaOpt.get();
+
         if (!validarPinCuenta(numeroCuenta, pin)) {
             return "Error: PIN incorrecto.";
         }
@@ -193,11 +212,18 @@ public class TransaccionesControlador {
     }
 
     public String realizarRetiroEnDolares(String numeroCuenta, String pin, String palabraIngresada, int montoRetiro) {
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        if (!cuentaOpt.isPresent()) {
-            return "Error: Número de cuenta no registrado.";
+        Cuenta cuenta = null;
+        for (Cliente cliente : clientes) {
+            for (Cuenta c : cliente.getMisCuentas()) {
+                if (c.getCodigo().equals(numeroCuenta)) {
+                    cuenta = c;
+                    break;
+                }
+            }
+            if (cuenta != null) {
+                break;
+            }
         }
-        Cuenta cuenta = cuentaOpt.get();
 
         if (!validarPinCuenta(numeroCuenta, pin)) {
             return "Error: PIN incorrecto.";
@@ -211,7 +237,7 @@ public class TransaccionesControlador {
             return "Error: El monto de retiro debe ser un número entero mayor a cero.";
         }
 
-        double tipoCambio = TipoDeCambioBCCR.obtenerTipoCambioVenta();
+        double tipoCambio = TipoDeCambioBCCR.getTipoCambioVenta();
         double montoEnColones = montoRetiro * tipoCambio;
 
         if (montoEnColones > cuenta.getSaldo()) {
@@ -230,15 +256,19 @@ public class TransaccionesControlador {
     }
 
     public String validarCuentaDestino(String numeroCuentaOrigen, String numeroCuentaDestino) {
-        Optional<Cuenta> cuentaOrigenOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuentaOrigen);
-        Optional<Cuenta> cuentaDestinoOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuentaDestino);
 
-        if (!cuentaDestinoOpt.isPresent()) {
-            return "La cuenta destino no existe.";
+        Cuenta cuentaOrigen = null;
+        Cuenta cuentaDestino = null;
+        // Validar cuentas
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuentaOrigen)) {
+                    cuentaOrigen = cuenta;
+                } else if (cuenta.getCodigo().equals(numeroCuentaDestino)) {
+                    cuentaDestino = cuenta;
+                }
+            }
         }
-
-        Cuenta cuentaOrigen = cuentaOrigenOpt.get();
-        Cuenta cuentaDestino = cuentaDestinoOpt.get();
 
         if (cuentaOrigen.getMiCliente().getIdentificacion() != cuentaDestino.getMiCliente().getIdentificacion()) {
             return "La cuenta destino no pertenece al mismo dueño de la cuenta origen.";
@@ -254,19 +284,18 @@ public class TransaccionesControlador {
             return "Error: PIN incorrecto.";
         }
 
+        Cuenta cuentaOrigen = null;
+        Cuenta cuentaDestino = null;
         // Validar cuentas
-        Optional<Cuenta> cuentaOrigenOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuentaOrigen);
-        Optional<Cuenta> cuentaDestinoOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuentaDestino);
-
-        if (!cuentaOrigenOpt.isPresent()) {
-            return "Error: La cuenta de origen no está registrada.";
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuentaOrigen)) {
+                    cuentaOrigen = cuenta;
+                } else if (cuenta.getCodigo().equals(numeroCuentaDestino)) {
+                    cuentaDestino = cuenta;
+                }
+            }
         }
-        if (!cuentaDestinoOpt.isPresent()) {
-            return "Error: La cuenta de destino no está registrada.";
-        }
-
-        Cuenta cuentaOrigen = cuentaOrigenOpt.get();
-        Cuenta cuentaDestino = cuentaDestinoOpt.get();
 
         // Validar que sean del mismo dueño
         if (cuentaOrigen.getMiCliente().getIdentificacion() != cuentaDestino.getMiCliente().getIdentificacion()) {
@@ -299,7 +328,7 @@ public class TransaccionesControlador {
                 cuentaDestino);
 
         // Guardar cambios en persistencia
-        PersistenciaDatos.guardarCuentas(cuentaControlador.getCuentas());
+        PersistenciaDatos.guardarDatos(clientes);
 
         // Formatear mensaje de respuesta
         String mensaje = String.format(
@@ -317,11 +346,9 @@ public class TransaccionesControlador {
     }
 
     public List<Transaccion> consultarTransacciones(String numeroCuenta, String pin, String palabraIngresada) {
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        if (!cuentaOpt.isPresent()) {
-            throw new IllegalArgumentException("Error: La cuenta no está registrada.");
+        if (!verificarCuenta(numeroCuenta)) {
+            throw new IllegalArgumentException("Error: La cuenta no existe.");
         }
-        // Cuenta cuenta = cuentaOpt.get();
 
         if (!validarPinCuenta(numeroCuenta, pin)) {
             throw new IllegalArgumentException("Error: PIN incorrecto.");
@@ -343,20 +370,34 @@ public class TransaccionesControlador {
     }
 
     private void registrarTransaccion(String tipo, double monto, String numeroCuenta, double montoReal, Cuenta cuenta) {
-        Transaccion transaccion = new Transaccion(tipo, monto, numeroCuenta, cuenta.getCantidadTransacciones());
-        cuenta.agregarTransaccion(transaccion);
+        Transaccion transaccion = new Transaccion(tipo, monto, numeroCuenta, false);
+        List<Transaccion> transacciones = cuenta.getTransacciones();
         transacciones.add(transaccion);
-        PersistenciaDatos.guardarTransacciones(transacciones);
+        PersistenciaDatos.guardarDatos(clientes);
     }
 
     public boolean validarPinCuenta(String numeroCuenta, String pin) {
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        return cuentaOpt.isPresent() && cuentaOpt.get().verificarPin(pin);
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuenta) && cuenta.verificarPin(pin)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
     }
 
     public boolean verificarCuenta(String numeroCuenta) {
-        Optional<Cuenta> cuentaOpt = cuentaControlador.obtenerCuentaPorNumero(numeroCuenta);
-        return cuentaOpt.isPresent();
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuenta)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

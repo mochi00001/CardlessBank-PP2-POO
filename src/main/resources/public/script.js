@@ -223,8 +223,9 @@ var App = {
 
 
         // Asignar eventos a los botones
-        document.getElementById('consultarTipoCambioCompra').addEventListener('click', App.consultarTipoCambioCompra);
-        document.getElementById('consultarTipoCambioVenta').addEventListener('click', App.consultarTipoCambioVenta);
+        // Consultar Tipo de Cambio de Compra y Venta
+        App.consultarTipoCambioCompra();
+        App.consultarTipoCambioVenta();
 
         // Consultar Saldo Actual en Colones
         var btnConsultarSaldoColones = document.querySelector('#formSaldoColones button');

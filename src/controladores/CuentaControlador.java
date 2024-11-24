@@ -2,7 +2,6 @@ package controladores;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,34 +16,24 @@ import servicios.PersistenciaDatos;
 import servicios.TipoDeCambioBCCR;
 
 public class CuentaControlador {
-    private List<Cuenta> cuentas;
+    private List<Cliente> clientes;
+    private TransaccionesControlador transaccionesControlador;
 
-    public CuentaControlador(ClienteControlador clienteControlador) {
-        this.cuentas = new ArrayList<>();
-        cargarCuentas(clienteControlador);
+    public CuentaControlador(List<Cliente> clientes) {
+        this.clientes = clientes;
+        transaccionesControlador = new TransaccionesControlador(clientes);
     }
 
-    public void cargarCuentas(ClienteControlador clienteControlador) {
-        List<Cuenta> cuentasDesdeArchivo = PersistenciaDatos.cargarCuentas(clienteControlador);
-
-        for (Cuenta cuenta : cuentasDesdeArchivo) {
-            if (!cuentas.contains(cuenta)) {
-                cuentas.add(cuenta);
-                if (cuenta.getMiCliente() != null && !cuenta.getMiCliente().getMisCuentas().contains(cuenta)) {
-                    cuenta.getMiCliente().getMisCuentas().add(cuenta);
-                }
-            }
-        }
-    }
-
-    public List<Cuenta> getCuentas() {
-        return cuentas;
+    public TransaccionesControlador getTransaccionesControlador() {
+        return transaccionesControlador;
     }
 
     public Optional<Cuenta> obtenerCuentaPorNumero(String numeroCuenta) {
-        for (Cuenta cuenta : cuentas) {
-            if (cuenta.getCodigo().equals(numeroCuenta)) {
-                return Optional.of(cuenta);
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuenta)) {
+                    return Optional.of(cuenta);
+                }
             }
         }
         return Optional.empty();
@@ -61,32 +50,20 @@ public class CuentaControlador {
                 }
             }
 
-            // Generar un número de cuenta único
-            String numeroCuenta = generarNumeroCuentaUnico();
-            // System.out.println("El numero de cuenta es: " + numeroCuenta);
-            Cuenta nuevaCuenta = new Cuenta(saldoInicial, numeroCuenta, pin, cliente);
+            Cuenta nuevaCuenta = new Cuenta(saldoInicial, pin, cliente);
             cliente.agregarCuenta(nuevaCuenta);
-            // System.out.println("Cuenta agregada al cliente " + cliente.getNombre() + "con
-            // el numero de cuenta:" + nuevaCuenta.getCodigo());
-            cuentas.add(nuevaCuenta);
-            PersistenciaDatos.guardarCuentas(cuentas);
-            // System.out.println("Cuenta guardada en el archivo");
-            return numeroCuenta;
+            PersistenciaDatos.guardarDatos(clientes);
+            return nuevaCuenta.getCodigo();
         } catch (Exception e) {
             // System.err.println("Error al crear la cuenta: " + e.getMessage());
             return null;
         }
     }
 
-    private String generarNumeroCuentaUnico() {
-        // Puedes implementar una lógica para generar un número de cuenta único
-        return "CTA-" + (cuentas.size());
-    }
-
     public boolean cambiarPinCuenta(Cuenta cuenta, String nuevoPin) {
         try {
             cuenta.setPin(nuevoPin);
-            PersistenciaDatos.guardarCuentas(cuentas);
+            PersistenciaDatos.guardarDatos(clientes);
             return true;
         } catch (Exception e) {
             System.err.println("Error al cambiar el PIN: " + e.getMessage());
@@ -118,7 +95,7 @@ public class CuentaControlador {
             return null;
         }
         double saldo = cuenta.getSaldo();
-        double tipoCambio = TipoDeCambioBCCR.obtenerTipoCambioCompra();
+        double tipoCambio = TipoDeCambioBCCR.getTipoCambioCompra();
         double saldoEnDivisaExtranjera = saldo / tipoCambio;
         return String.format(
                 "Estimado usuario: %s el saldo actual de su cuenta %s es de %.2f dólares.\n\n"
@@ -160,7 +137,7 @@ public class CuentaControlador {
         resultado.put("fechaCreacion", cuenta.getFechaCreacion().toString());
 
         // Obtener el tipo de cambio actual
-        double tipoCambioCompra = TipoDeCambioBCCR.obtenerTipoCambioCompra();
+        double tipoCambioCompra = TipoDeCambioBCCR.getTipoCambioCompra();
         double saldoEnDolares = cuenta.getSaldo() / tipoCambioCompra;
 
         // Formatear la fecha actual
@@ -178,10 +155,12 @@ public class CuentaControlador {
 
     public String estadoCuentaDolares(String numeroCuenta, String pin) {
         Cuenta cuenta = null;
-        for (Cuenta c : cuentas) {
-            if (c.getCodigo().equals(numeroCuenta)) {
-                cuenta = c;
-                break;
+        for (Cliente cliente : clientes) {
+            for (Cuenta c : cliente.getMisCuentas()) {
+                if (c.getCodigo().equals(numeroCuenta)) {
+                    cuenta = c;
+                    break;
+                }
             }
         }
 
@@ -193,7 +172,7 @@ public class CuentaControlador {
         }
 
         TipoDeCambioBCCR.obtenerTipoCambioHoy();
-        double tasaDeCambio = TipoDeCambioBCCR.obtenerTipoCambioCompra();
+        double tasaDeCambio = TipoDeCambioBCCR.getTipoCambioCompra();
         double saldoColones = cuenta.getSaldo();
         double saldoDolares = saldoColones / tasaDeCambio;
         Cliente cliente = cuenta.getMiCliente();
@@ -234,12 +213,13 @@ public class CuentaControlador {
         Cuenta cuentaOrigen = null;
         Cuenta cuentaDestino = null;
 
-        for (Cuenta c : cuentas) {
-            if (c.getCodigo().equals(cuentaOrigenId)) {
-                cuentaOrigen = c;
-            }
-            if (c.getCodigo().equals(cuentaDestinoId)) {
-                cuentaDestino = c;
+        for (Cliente cliente : clientes) {
+            for (Cuenta c : cliente.getMisCuentas()) {
+                if (c.getCodigo().equals(cuentaOrigenId)) {
+                    cuentaOrigen = c;
+                } else if (c.getCodigo().equals(cuentaDestinoId)) {
+                    cuentaDestino = c;
+                }
             }
         }
 
@@ -253,7 +233,7 @@ public class CuentaControlador {
 
         if (cuentaOrigen.retirar(monto)) {
             cuentaDestino.depositar(monto);
-            PersistenciaDatos.guardarCuentas(cuentas);
+            PersistenciaDatos.guardarDatos(clientes);
             return "Transferencia realizada con éxito.";
         } else {
             return "Error: Saldo insuficiente en la cuenta de origen.";
@@ -261,14 +241,18 @@ public class CuentaControlador {
     }
 
     public boolean eliminarCuenta(String numeroCuenta) {
-        for (Cuenta cuenta : cuentas) {
-            if (cuenta.getCodigo().equals(numeroCuenta)) {
-                cuenta.setEstatus("Eliminada");
-                eliminarTransaccionesAsociadas(numeroCuenta);
-                PersistenciaDatos.guardarCuentas(cuentas);
-                return true;
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuenta)) {
+                    cuenta.setEstatus("Eliminada");
+                    cuenta.setSaldo(0);
+                    eliminarTransaccionesAsociadas(numeroCuenta);
+                    PersistenciaDatos.guardarDatos(clientes);
+                    return true;
+                }
             }
         }
+
         return false;
     }
 

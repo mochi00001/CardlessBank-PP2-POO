@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Cliente {
+    private static int cantidadCuentasDelSistema;
     private String nombre;
     private long identificacion;
     private String numTelefono;
@@ -16,6 +17,14 @@ public abstract class Cliente {
         this.numTelefono = numTelefono;
         this.correoElectronico = correoElectronico;
         this.misCuentas = new ArrayList<>();
+    }
+
+    public static int getCantidadCuentasDelSistema() {
+        return cantidadCuentasDelSistema;
+    }
+
+    public static void setCantidadCuentasDelSistema(int cantidadCuentasDelSistema) {
+        Cliente.cantidadCuentasDelSistema = cantidadCuentasDelSistema;
     }
 
     public List<Cuenta> getMisCuentas() {

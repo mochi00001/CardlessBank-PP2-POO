@@ -197,7 +197,7 @@ public class XMLUtils {
     }
 
     // Método para leer cuentas desde un archivo XML
-    public static List<Cuenta> leerCuentasDesdeArchivoXML(String rutaArchivo, ClienteControlador clienteControlador) {
+    public static void leerCuentasDesdeArchivoXML(String rutaArchivo, ClienteControlador clienteControlador) {
         List<Cuenta> listaCuentas = new ArrayList<>();
 
         try {
@@ -249,8 +249,6 @@ public class XMLUtils {
             System.err.println("Error al leer el archivo XML: " + e.getMessage());
             e.printStackTrace();
         }
-
-        return listaCuentas;
     }
 
     // Método auxiliar para obtener el valor de una etiqueta de manera segura
@@ -291,7 +289,7 @@ public class XMLUtils {
                 transaccionElement.appendChild(montoElement);
 
                 Element comisionElement = doc.createElement("comision");
-                comisionElement.appendChild(doc.createTextNode(String.valueOf(transaccion.isComision())));
+                comisionElement.appendChild(doc.createTextNode(String.valueOf(transaccion.getComision())));
                 transaccionElement.appendChild(comisionElement);
 
                 Element numeroCuentaElement = doc.createElement("numeroCuenta");
@@ -338,10 +336,10 @@ public class XMLUtils {
                             .getTextContent();
                     String fechaStr = transaccionElement.getElementsByTagName("fecha").item(0).getTextContent();
                     LocalDate fecha = LocalDate.parse(fechaStr); // Asegúrate de que el formato sea compatible
+                    boolean comision = Boolean
+                            .parseBoolean(transaccionElement.getElementsByTagName("comision").item(0).getTextContent());
 
-                    int cantidadTransacciones = 0;
-
-                    Transaccion transaccion = new Transaccion(tipo, monto, numeroCuenta, cantidadTransacciones);
+                    Transaccion transaccion = new Transaccion(tipo, monto, numeroCuenta, comision);
                     transaccion.setFecha(fecha);
 
                     transacciones.add(transaccion);

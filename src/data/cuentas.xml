@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <cuentas>
     <cuenta>
-        <codigo>cta-0</codigo>
+        <codigo>cta-1</codigo>
         <estatus>Activa</estatus>
-        <saldo>100911,65</saldo>
+        <saldo>90000,65</saldo>
         <identificacion>123456789</identificacion>
         <pin>ynKBUNawkgpRHTXoPYo9lQ==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-1</codigo>
+        <codigo>cta-2</codigo>
         <estatus>Activa</estatus>
-        <saldo>5000,00</saldo>
+        <saldo>105000,00</saldo>
         <identificacion>987654321</identificacion>
         <pin>Emuqwp6Rpi2YBm6jMDyw/A==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-2</codigo>
+        <codigo>cta-3</codigo>
         <estatus>Activa</estatus>
         <saldo>9000,00</saldo>
         <identificacion>305260528</identificacion>
         <pin>OR3xuVEo7ZtGt1i2qEBbig==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-3</codigo>
+        <codigo>cta-4</codigo>
         <estatus>Activa</estatus>
         <saldo>15000,00</saldo>
         <identificacion>123456789</identificacion>
         <pin>OR3xuVEo7ZtGt1i2qEBbig==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-4</codigo>
-        <estatus>Eliminada</estatus>
-        <saldo>109326,64</saldo>
-        <identificacion>999999999</identificacion>
-        <pin>OR3xuVEo7ZtGt1i2qEBbig==</pin>
-    </cuenta>
-    <cuenta>
         <codigo>cta-5</codigo>
         <estatus>Eliminada</estatus>
-        <saldo>1000000,00</saldo>
+        <saldo>0,00</saldo>
         <identificacion>999999999</identificacion>
         <pin>OR3xuVEo7ZtGt1i2qEBbig==</pin>
     </cuenta>
     <cuenta>
         <codigo>cta-6</codigo>
+        <estatus>Eliminada</estatus>
+        <saldo>0,00</saldo>
+        <identificacion>999999999</identificacion>
+        <pin>OR3xuVEo7ZtGt1i2qEBbig==</pin>
+    </cuenta>
+    <cuenta>
+        <codigo>cta-7</codigo>
         <estatus>Activa</estatus>
         <saldo>9884,80</saldo>
         <identificacion>208190240</identificacion>
         <pin>WGB85Y3FgvlW018apmAQkg==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-7</codigo>
+        <codigo>cta-8</codigo>
         <estatus>Activa</estatus>
         <saldo>10000,00</saldo>
         <identificacion>208190240</identificacion>
         <pin>5RX/bQKnsSWpThy/t9LRzg==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-8</codigo>
+        <codigo>cta-9</codigo>
         <estatus>Activa</estatus>
         <saldo>30000,00</saldo>
         <identificacion>305260528</identificacion>
         <pin>qYWhOKapO2XL+P+BvPPNow==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-9</codigo>
+        <codigo>cta-10</codigo>
         <estatus>Activa</estatus>
         <saldo>50000,00</saldo>
         <identificacion>208190473</identificacion>
         <pin>pPtXxz8Ie6dYkT8HTrZGjQ==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-10</codigo>
+        <codigo>cta-11</codigo>
         <estatus>Activa</estatus>
         <saldo>30000,00</saldo>
         <identificacion>105190222</identificacion>
         <pin>CyP1p95yhomgb1ZOZRtuug==</pin>
     </cuenta>
     <cuenta>
-        <codigo>cta-11</codigo>
+        <codigo>cta-12</codigo>
         <estatus>Activa</estatus>
         <saldo>2000,00</saldo>
         <identificacion>208190240</identificacion>

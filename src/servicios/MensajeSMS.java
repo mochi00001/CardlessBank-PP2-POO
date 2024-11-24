@@ -15,8 +15,8 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
 public class MensajeSMS {
     // Credenciales
-    private static final String KEY = "OCCOnRovxFlI9JHNRrguu1gx";
-    private static final String SECRET = "2tZ3leXg@Hs()p743nC-97fh@&jEP@!^fNjO)hEx";
+    private static final String KEY = "OCA4oownD_ZLeK4_DtTtjlP_";
+    private static final String SECRET = "Uht-C1iR297CzrLL*(c!bwFcS!H(n9CjAHIyN2*8";
     // Código generado
     private String codigoGenerado;
 

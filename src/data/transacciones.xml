@@ -1,52 +1,143 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <transacciones>
     <transaccion>
-        <fecha>2024-11-18</fecha>
-        <tipo>Retiro en Colones</tipo>
-        <monto>10000.0</monto>
-        <comision>false</comision>
-        <numeroCuenta>cta-7</numeroCuenta>
-    </transaccion>
-    <transaccion>
-        <fecha>2024-11-18</fecha>
-        <tipo>Retiro en Colones</tipo>
-        <monto>10000.0</monto>
-        <comision>false</comision>
-        <numeroCuenta>cta-7</numeroCuenta>
-    </transaccion>
-    <transaccion>
-        <fecha>2024-11-18</fecha>
-        <tipo>Retiro en Dólares</tipo>
-        <monto>10.0</monto>
-        <comision>false</comision>
-        <numeroCuenta>cta-6</numeroCuenta>
-    </transaccion>
-    <transaccion>
-        <fecha>2024-11-18</fecha>
-        <tipo>Transferencia</tipo>
-        <monto>10000.0</monto>
-        <comision>false</comision>
-        <numeroCuenta>cta-6</numeroCuenta>
-    </transaccion>
-    <transaccion>
-        <fecha>2024-11-18</fecha>
-        <tipo>Transferencia</tipo>
-        <monto>10000.0</monto>
-        <comision>false</comision>
-        <numeroCuenta>cta-7</numeroCuenta>
-    </transaccion>
-    <transaccion>
-        <fecha>2024-11-23</fecha>
-        <tipo>Retiro en Colones</tipo>
-        <monto>5000.0</monto>
-        <comision>false</comision>
-        <numeroCuenta>cta-6</numeroCuenta>
-    </transaccion>
-    <transaccion>
         <fecha>2024-11-23</fecha>
         <tipo>Depósito en Colones</tipo>
         <monto>50000.0</monto>
         <comision>false</comision>
         <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Colones</tipo>
+        <monto>5000.0</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Dólares</tipo>
+        <monto>3555.2999999999997</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Colones</tipo>
+        <monto>1015.8</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Dólares</tipo>
+        <monto>1523.6999999999998</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Retiro en Colones</tipo>
+        <monto>20000.0</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Retiro en Dólares</tipo>
+        <monto>513.78</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Retiro en Colones</tipo>
+        <monto>20000.0</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-2</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-18</fecha>
+        <tipo>Retiro en Colones</tipo>
+        <monto>10000.0</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-18</fecha>
+        <tipo>Retiro en Colones</tipo>
+        <monto>10000.0</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-18</fecha>
+        <tipo>Transferencia</tipo>
+        <monto>10000.0</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Colones</tipo>
+        <monto>1000.0</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Dólares</tipo>
+        <monto>5079.0</monto>
+        <comision>false</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Dólares</tipo>
+        <monto>5079.0</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Colones</tipo>
+        <monto>1200.0</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Colones</tipo>
+        <monto>2000.0</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Colones</tipo>
+        <monto>3450.0</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Dólares</tipo>
+        <monto>3555.2999999999997</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Dólares</tipo>
+        <monto>3555.2999999999997</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
+    </transaccion>
+    <transaccion>
+        <fecha>2024-11-24</fecha>
+        <tipo>Depósito en Colones</tipo>
+        <monto>1250.0</monto>
+        <comision>true</comision>
+        <numeroCuenta>cta-7</numeroCuenta>
     </transaccion>
 </transacciones>

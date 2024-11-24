@@ -17,14 +17,13 @@ public class PersistenciaDatos {
     // Métodos para manejar datos
 
     public static void cargarDatos(ClienteControlador clienteControlador) {
-        List<Cliente> clientes = clienteControlador.obtenerClientes();
-        List<Transaccion> transacciones;
-        clientes = PersistenciaDatos.cargarClientes();
+        List<Cliente> clientes = PersistenciaDatos.cargarClientes();
         clienteControlador.setClientes(clientes);
+
         PersistenciaDatos.cargarCuentas(clienteControlador);
-        transacciones = PersistenciaDatos.cargarTransacciones();
-        clientes = clienteControlador.obtenerClientes();
-        for (Cliente cliente : clientes) {
+        List<Transaccion> transacciones = PersistenciaDatos.cargarTransacciones();
+
+        for (Cliente cliente : clienteControlador.obtenerClientes()) {
             for (Cuenta cuenta : cliente.getMisCuentas()) {
                 for (Transaccion transaccion : transacciones) {
                     if (transaccion.getCodigoCuenta().equals(cuenta.getCodigo())) {
@@ -50,6 +49,7 @@ public class PersistenciaDatos {
                 transacciones.addAll(cuenta.getTransacciones());
             }
         }
+        PersistenciaDatos.guardarTransacciones(transacciones);
     }
 
     public static void guardarCuentas(List<Cuenta> cuentas) {

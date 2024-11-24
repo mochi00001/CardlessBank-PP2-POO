@@ -88,4 +88,12 @@
         <numTelefono>89655235</numTelefono>
         <correoElectronico>niaRojas@gmail.com</correoElectronico>
     </cliente>
+    <cliente tipo="fisico">
+        <fechaNacimiento>2000-04-24</fechaNacimiento>
+        <maxCuentas>3</maxCuentas>
+        <nombre>Luisito Comunica</nombre>
+        <identificacion>205190473</identificacion>
+        <numTelefono>89655235</numTelefono>
+        <correoElectronico>luismadriz9@gmail.com</correoElectronico>
+    </cliente>
 </clientes>

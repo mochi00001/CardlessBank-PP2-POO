@@ -468,7 +468,7 @@ public class App {
         post("/transacciones/depositoColones", (req, res) -> {
             res.type("application/json");
             TransaccionRequest request = gson.fromJson(req.body(), TransaccionRequest.class);
-            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            String resultado = clienteControlador.getTransaccionesControlador()
                     .realizarDepositoColones(request.getNumeroCuenta(),
                             request.getMonto());
             if (resultado.startsWith("Error")) {
@@ -483,7 +483,7 @@ public class App {
         post("/transacciones/depositoDolares", (req, res) -> {
             res.type("application/json");
             TransaccionRequest request = gson.fromJson(req.body(), TransaccionRequest.class);
-            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            String resultado = clienteControlador.getTransaccionesControlador()
                     .realizarDepositoDolares(request.getNumeroCuenta(),
                             request.getMonto());
             if (resultado.startsWith("Error")) {
@@ -502,7 +502,7 @@ public class App {
             String numeroCuenta = req.params(":numeroCuenta");
             String pin = req.params(":pin");
 
-            boolean esValido = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            boolean esValido = clienteControlador.getTransaccionesControlador()
                     .validarPinCuenta(numeroCuenta, pin);
 
             if (esValido) {
@@ -518,7 +518,7 @@ public class App {
             res.type("application/json");
             String numeroCuenta = req.params(":numeroCuenta");
 
-            String palabraGenerada = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            String palabraGenerada = clienteControlador.getTransaccionesControlador()
                     .enviarPalabraVerificacion(numeroCuenta);
 
             if (palabraGenerada != null) {
@@ -533,7 +533,7 @@ public class App {
             res.type("application/json");
             String palabraIngresada = req.params(":palabraIngresada");
 
-            boolean esValida = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            boolean esValida = clienteControlador.getTransaccionesControlador()
                     .validarPalabraClave(palabraIngresada);
 
             if (esValida) {
@@ -548,7 +548,7 @@ public class App {
         post("/transacciones/retiroColones", (req, res) -> {
             res.type("application/json");
             RetiroRequest request = gson.fromJson(req.body(), RetiroRequest.class);
-            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            String resultado = clienteControlador.getTransaccionesControlador()
                     .realizarRetiroEnColones(
                             request.getNumeroCuenta(),
                             request.getPin(),
@@ -567,7 +567,7 @@ public class App {
         post("/transacciones/retiroDolares", (req, res) -> {
             res.type("application/json");
             RetiroRequest request = gson.fromJson(req.body(), RetiroRequest.class);
-            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            String resultado = clienteControlador.getTransaccionesControlador()
                     .realizarRetiroEnDolares(
                             request.getNumeroCuenta(),
                             request.getPin(),
@@ -588,7 +588,7 @@ public class App {
             String numeroCuentaOrigen = req.params(":numeroCuentaOrigen");
             String numeroCuentaDestino = req.params(":numeroCuentaDestino");
 
-            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            String resultado = clienteControlador.getTransaccionesControlador()
                     .validarCuentaDestino(numeroCuentaOrigen, numeroCuentaDestino);
 
             if (resultado.equals("SUCCESS")) {
@@ -603,7 +603,7 @@ public class App {
         post("/transacciones/transferencia", (req, res) -> {
             res.type("application/json");
             TransferenciaRequest request = gson.fromJson(req.body(), TransferenciaRequest.class);
-            String resultado = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            String resultado = clienteControlador.getTransaccionesControlador()
                     .realizarTransferencia(
                             request.getNumeroCuentaOrigen(),
                             request.getPinCuentaOrigen(),
@@ -630,20 +630,20 @@ public class App {
             String palabraIngresada = request.getPalabraIngresada();
 
             // Validar PIN y palabra clave
-            boolean esCuentaValida = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            boolean esCuentaValida = clienteControlador.getTransaccionesControlador()
                     .validarPinCuenta(numeroCuenta, pin);
             if (!esCuentaValida) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, "Número de cuenta o PIN incorrectos."));
             }
 
-            boolean esPalabraClaveValida = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            boolean esPalabraClaveValida = clienteControlador.getTransaccionesControlador()
                     .validarPalabraClave(palabraIngresada);
             if (!esPalabraClaveValida) {
                 return gson.toJson(new StandardResponse(StatusResponse.ERROR, "La palabra ingresada no coincide."));
             }
 
             // Obtener las transacciones
-            List<Transaccion> transacciones = clienteControlador.getCuentaControlador().getTransaccionesControlador()
+            List<Transaccion> transacciones = clienteControlador.getTransaccionesControlador()
                     .obtenerTransaccionesPorCuenta(numeroCuenta);
 
             // Preparar datos de respuesta

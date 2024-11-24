@@ -3,7 +3,6 @@ package controladores;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,15 +16,13 @@ import servicios.TipoDeCambioBCCR;
 
 public class CuentaControlador {
     private List<Cliente> clientes;
-    private TransaccionesControlador transaccionesControlador;
 
     public CuentaControlador(List<Cliente> clientes) {
         this.clientes = clientes;
-        transaccionesControlador = new TransaccionesControlador(clientes);
     }
 
-    public TransaccionesControlador getTransaccionesControlador() {
-        return transaccionesControlador;
+    public void setClientes(List<Cliente> clientes) {
+        this.clientes = clientes;
     }
 
     public Optional<Cuenta> obtenerCuentaPorNumero(String numeroCuenta) {
@@ -98,9 +95,10 @@ public class CuentaControlador {
         double tipoCambio = TipoDeCambioBCCR.getTipoCambioCompra();
         double saldoEnDivisaExtranjera = saldo / tipoCambio;
         return String.format(
-                "Estimado usuario: %s el saldo actual de su cuenta %s es de %.2f dólares.\n\n"
-                        + "Para esta conversión se utilizó el tipo de cambio del dólar -precio de compra- "
-                        + "Según el BCCR, el tipo de cambio de compra del dólar de hoy es de: %.2f",
+                "<p>Estimado usuario: <strong>%s</strong></p>" +
+                        "<p>El saldo actual de su cuenta <strong>%s</strong> es de <strong>%.2f</strong> dólares.</p>" +
+                        "<p>Para esta conversión se utilizó el tipo de cambio del dólar -precio de compra-.</p>" +
+                        "<p>Según el BCCR, el tipo de cambio de compra del dólar de hoy es de: <strong>%.2f</strong></p>",
                 cuenta.getMiCliente().getNombre(),
                 cuenta.getCodigo(),
                 saldoEnDivisaExtranjera,
@@ -178,14 +176,17 @@ public class CuentaControlador {
         Cliente cliente = cuenta.getMiCliente();
         String estatus = cuenta.getEstatus();
 
-        return String.format("Cliente:\n" +
-                "Nombre: %s\n" +
-                "Identificación: %s\n" +
-                "Número de Teléfono: %s\n" +
-                "Correo: %s\n" +
-                "Número de Cuenta: %s\n" +
-                "Saldo: $%.2f\n" +
-                "Estatus: %s",
+        return String.format(
+                "<p><strong>Cliente:</strong></p>" +
+                        "<ul>" +
+                        "<li><strong>Nombre:</strong> %s</li>" +
+                        "<li><strong>Identificación:</strong> %s</li>" +
+                        "<li><strong>Número de Teléfono:</strong> %s</li>" +
+                        "<li><strong>Correo:</strong> %s</li>" +
+                        "<li><strong>Número de Cuenta:</strong> %s</li>" +
+                        "<li><strong>Saldo:</strong> $%.2f</li>" +
+                        "<li><strong>Estatus:</strong> %s</li>" +
+                        "</ul>",
                 cliente.getNombre(),
                 cliente.getIdentificacion(),
                 cliente.getNumTelefono(),
@@ -231,8 +232,9 @@ public class CuentaControlador {
             return "Error: El monto de transferencia debe ser mayor a cero.";
         }
 
-        if (cuentaOrigen.retirar(monto)) {
-            cuentaDestino.depositar(monto);
+        if (cuentaOrigen.getSaldo() >= monto) {
+            cuentaOrigen.retirar(monto, 0);
+            cuentaDestino.depositar(monto, 0);
             PersistenciaDatos.guardarDatos(clientes);
             return "Transferencia realizada con éxito.";
         } else {
@@ -257,16 +259,17 @@ public class CuentaControlador {
     }
 
     private void eliminarTransaccionesAsociadas(String numeroCuenta) {
-        List<Transaccion> transacciones = PersistenciaDatos.cargarTransacciones();
-        Iterator<Transaccion> iterator = transacciones.iterator();
 
-        while (iterator.hasNext()) {
-            Transaccion transaccion = iterator.next();
-            if (transaccion.getCodigoCuenta().equals(numeroCuenta)) {
-                iterator.remove();
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuenta)) {
+                    for (Transaccion transaccion : cuenta.getTransacciones()) {
+                        cuenta.getTransacciones().remove(transaccion);
+                    }
+                }
             }
         }
-        PersistenciaDatos.guardarTransacciones(transacciones);
+        PersistenciaDatos.guardarDatos(clientes);
     }
 
 }

@@ -10,6 +10,7 @@ public class Transaccion {
     private transient LocalDate fecha;
     private double monto;
     private String codigoCuenta;
+    private double montoComision;
 
     public Transaccion(String tipo, double monto, String codigoCuenta, boolean comision) {
         this.tipo = tipo;
@@ -17,14 +18,18 @@ public class Transaccion {
         this.codigoCuenta = codigoCuenta;
         this.fecha = LocalDate.now();
         this.comision = comision;
+        // Calcular y almacenar la comisión si corresponde
+        if (comision) {
+            this.montoComision = calcularComision(monto);
+            System.out.println("Monto de comisión: " + this.montoComision);
+        } else {
+            this.montoComision = 0.0;
+        }
     }
 
-    // Calcula la comisión en función de la cantidad de transacciones
-    public static double calcularComision(double montoTransaccion, int cantidadTransacciones) {
-        if (cantidadTransacciones > LIMITE_TRANSACCIONES_SIN_COMISION) {
-            return PORCENTAJE_COMISION_SOBRE_DEPOSITOS_Y_RETIROS * montoTransaccion;
-        }
-        return 0; // No hay comisión para las primeras 5 transacciones
+    // Calcula la comisión como el 2% del monto de la transacción
+    public double calcularComision(double montoTransaccion) {
+        return montoTransaccion * PORCENTAJE_COMISION_SOBRE_DEPOSITOS_Y_RETIROS;
     }
 
     // Devuelve verdadero si hay una comisión aplicada en esta transacción
@@ -33,10 +38,7 @@ public class Transaccion {
     }
 
     public double getMontoComision() {
-        if (comision) {
-            return ((PORCENTAJE_COMISION_SOBRE_DEPOSITOS_Y_RETIROS / monto) - monto);
-        }
-        return 0;
+        return montoComision;
     }
 
     public void setComicion(boolean comision) {

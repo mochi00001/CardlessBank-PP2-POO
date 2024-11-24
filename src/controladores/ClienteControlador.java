@@ -16,17 +16,20 @@ public class ClienteControlador {
 
     private List<Cliente> clientes;
     private CuentaControlador cuentaControlador;
+    private TransaccionesControlador transaccionesControlador;
 
     public ClienteControlador() {
-        this.clientes = null;
-        if (clientes == null) {
-            clientes = new ArrayList<>();
-        }
+        this.clientes = new ArrayList<>();
         this.cuentaControlador = new CuentaControlador(clientes);
+        this.transaccionesControlador = new TransaccionesControlador(clientes);
     }
 
     public CuentaControlador getCuentaControlador() {
         return cuentaControlador;
+    }
+
+    public TransaccionesControlador getTransaccionesControlador() {
+        return transaccionesControlador;
     }
 
     public boolean crearClienteFisico(String nombre, long identificacion, String numTelefono, String correoElectronico,
@@ -35,7 +38,7 @@ public class ClienteControlador {
             Cliente nuevoCliente = new ClienteFisico(nombre, identificacion, numTelefono, correoElectronico,
                     fechaNacimiento, maxCuentas);
             clientes.add(nuevoCliente);
-            PersistenciaDatos.guardarClientes(clientes);
+            PersistenciaDatos.guardarDatos(clientes);
             return true;
         } else {
             return false;
@@ -48,7 +51,7 @@ public class ClienteControlador {
             Cliente nuevoCliente = new ClienteJuridico(nombre, identificacion, numTelefono, correoElectronico,
                     tipoNegocio, razonSocial);
             clientes.add(nuevoCliente);
-            PersistenciaDatos.guardarClientes(clientes);
+            PersistenciaDatos.guardarDatos(clientes);
             return true;
         } else {
             return false;
@@ -61,7 +64,7 @@ public class ClienteControlador {
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
             cliente.agregarCuenta(nuevaCuenta);
-            PersistenciaDatos.guardarClientes(clientes);
+            PersistenciaDatos.guardarDatos(clientes);
             return true;
         }
         return false;
@@ -82,6 +85,8 @@ public class ClienteControlador {
 
     public void setClientes(List<Cliente> clientes) {
         this.clientes = clientes;
+        this.cuentaControlador.setClientes(clientes);
+        this.transaccionesControlador.setClientes(clientes);
     }
 
     public boolean actualizarTelefono(long identificacion, String nuevoTelefono) {
@@ -90,7 +95,7 @@ public class ClienteControlador {
             try {
                 Cliente cliente = clienteOpt.get();
                 cliente.setNumTelefono(nuevoTelefono); // Esto puede lanzar una excepción
-                PersistenciaDatos.guardarClientes(clientes);
+                PersistenciaDatos.guardarDatos(clientes);
                 return true;
             } catch (IllegalArgumentException e) {
                 System.err.println("Error al actualizar el número de teléfono: " + e.getMessage());
@@ -107,7 +112,7 @@ public class ClienteControlador {
             try {
                 Cliente cliente = clienteOpt.get();
                 cliente.setCorreoElectronico(nuevoCorreo); // Esto puede lanzar una excepción
-                PersistenciaDatos.guardarClientes(clientes);
+                PersistenciaDatos.guardarDatos(clientes);
                 return true;
             } catch (IllegalArgumentException e) {
                 System.err.println("Error al actualizar el correo electrónico: " + e.getMessage());

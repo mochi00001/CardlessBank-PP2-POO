@@ -19,6 +19,10 @@ public class TransaccionesControlador {
         this.clientes = clientes;
     }
 
+    public void setClientes(List<Cliente> clientes) {
+        this.clientes = clientes;
+    }
+
     public List<Transaccion> obtenerTransaccionesPorCuenta(String numeroCuenta) {
         List<Transaccion> transaccionesPorCuenta;
         transaccionesPorCuenta = new ArrayList<>();
@@ -33,9 +37,14 @@ public class TransaccionesControlador {
         return transaccionesPorCuenta;
     }
 
-    private void actualizarSaldo(Cuenta cuenta, double monto) {
-        double nuevoSaldo = cuenta.getSaldo() + monto;
-        cuenta.setSaldo(nuevoSaldo);
+    private void actualizarSaldo(Cuenta cuenta, double monto, double montoComision, String tipoTransaccion) {
+        if (tipoTransaccion.equals("Depósito en Colones") || tipoTransaccion.equals("Depósito en Dólares")) {
+            double montoNeto = monto - montoComision;
+            cuenta.setSaldo(cuenta.getSaldo() + montoNeto);
+        } else if (tipoTransaccion.equals("Retiro en Colones") || tipoTransaccion.equals("Retiro en Dólares")) {
+            double montoTotal = monto + montoComision;
+            cuenta.setSaldo(cuenta.getSaldo() - montoTotal);
+        }
         PersistenciaDatos.guardarDatos(clientes);
     }
 
@@ -49,6 +58,17 @@ public class TransaccionesControlador {
         }
     }
 
+    public Cuenta obtenerCuenta(String numeroCuenta) {
+        for (Cliente cliente : clientes) {
+            for (Cuenta cuenta : cliente.getMisCuentas()) {
+                if (cuenta.getCodigo().equals(numeroCuenta)) {
+                    return cuenta;
+                }
+            }
+        }
+        return null;
+    }
+
     public String realizarDepositoColones(String numeroCuenta, int monto) {
         if (!verificarCuenta(numeroCuenta)) {
             return "Error: Número de cuenta no registrado.";
@@ -57,38 +77,33 @@ public class TransaccionesControlador {
             return "Error: El monto debe ser mayor a cero.";
         }
 
-        Cuenta cuenta = null;
-        for (Cliente cliente : clientes) {
-            for (Cuenta c : cliente.getMisCuentas()) {
-                if (c.getCodigo().equals(numeroCuenta)) {
-                    cuenta = c;
-                    break;
-                }
-            }
-            if (cuenta != null) {
-                break;
-            }
-        }
-
+        Cuenta cuenta = obtenerCuenta(numeroCuenta);
         if (cuenta == null) {
             return "Error: No se encontró la cuenta.";
         }
-        Transaccion transaccion = new Transaccion("Depósito en Colones", monto, numeroCuenta,
-                true);
-        cuenta.agregarTransaccion(transaccion);
-        double montoRealDepositado = monto - transaccion.getMontoComision();
 
-        actualizarSaldo(cuenta, montoRealDepositado);
+        int cantidadTransacciones = cuenta.getCantidadTransacciones() + 1;
+        boolean comision = cantidadTransacciones > 5;
+
+        Transaccion transaccion = new Transaccion("Depósito en Colones", monto, numeroCuenta, comision);
+        cuenta.agregarTransaccion(transaccion);
+
+        // Ajustar el saldo
+        double montoNeto = monto - transaccion.getMontoComision();
+        cuenta.depositar(monto, transaccion.getMontoComision());
+
         PersistenciaDatos.guardarDatos(clientes);
 
-        registrarTransaccion("Depósito en Colones", monto, numeroCuenta, montoRealDepositado, cuenta);
-        return String.format("Depósito realizado exitosamente de %d colones.\n\n" +
-                "El monto real depositado a su cuenta %s es de %.2f colones\n" +
-                "El monto cobrado por concepto de comisión fue de %.2f colones, que fueron rebajados automáticamente de su saldo actual.",
+        return String.format(
+                "<p>Depósito realizado exitosamente de <strong>%d</strong> colones.</p>" +
+                        "<p>El monto real depositado a su cuenta <strong>%s</strong> es de <strong>%.2f</strong> colones.</p>"
+                        +
+                        "<p>El monto cobrado por concepto de comisión fue de <strong>%.2f</strong> colones, que fueron rebajados automáticamente de su saldo actual.</p>",
                 monto,
-                numeroCuenta,
-                montoRealDepositado,
+                transaccion.getCodigoCuenta(),
+                montoNeto,
                 transaccion.getMontoComision());
+
     }
 
     public String realizarDepositoDolares(String numeroCuenta, double montoUSD) {
@@ -109,23 +124,24 @@ public class TransaccionesControlador {
 
         double tipoCambio = TipoDeCambioBCCR.getTipoCambioCompra();
         double montoColones = montoUSD * tipoCambio;
-
+        // System.out.println("Monto en colones: " + montoColones);
         // Crear y agregar la transacción, incluyendo el cálculo de la comisión
-        Transaccion transaccion = new Transaccion("Depósito en Dólares", montoColones, numeroCuenta,
-                true);
-        cuenta.agregarTransaccion(transaccion);
-        double montoRealDepositado = montoColones - transaccion.getMontoComision();
-
-        actualizarSaldo(cuenta, montoRealDepositado);
+        // Determinar si se aplica comisión
+        int cantidadTransacciones = cuenta.getCantidadTransacciones() + 1;
+        boolean comision = cantidadTransacciones > 5;
+        System.out.println("Comision: " + comision + ", Cantidad de transacciones: " + cantidadTransacciones);
+        // Crear la transacción
+        Transaccion transaccion = new Transaccion("Depósito en Colones", montoColones, numeroCuenta, comision);
+        registrarTransaccion("Depósito en Dólares", montoColones, numeroCuenta, cuenta);
         PersistenciaDatos.guardarDatos(clientes);
-
-        registrarTransaccion("Depósito en Dólares", montoColones, numeroCuenta, montoRealDepositado, cuenta);
-        return String.format("Depósito realizado exitosamente de %.2f dólares.\n\n" +
-                "El monto real depositado a su cuenta %s es de %.2f colones\n" +
-                "El monto cobrado por concepto de comisión fue de %.2f colones, que fueron rebajados automáticamente de su saldo actual.",
+        return String.format(
+                "<p>Depósito realizado exitosamente de <strong>%.2f</strong> dólares.</p>" +
+                        "<p>El monto real depositado a su cuenta <strong>%s</strong> es de <strong>%.2f</strong> colones.</p>"
+                        +
+                        "<p>El monto cobrado por concepto de comisión fue de <strong>%.2f</strong> colones, que fueron rebajados automáticamente de su saldo actual.</p>",
                 montoUSD,
-                numeroCuenta,
-                montoRealDepositado,
+                transaccion.getCodigoCuenta(),
+                transaccion.getMonto(),
                 transaccion.getMontoComision());
     }
 
@@ -203,12 +219,12 @@ public class TransaccionesControlador {
             return "Error: Fondos insuficientes para realizar el retiro.";
         }
 
-        actualizarSaldoRetiro(cuenta, montoRetiro);
-        registrarTransaccion("Retiro en Colones", montoRetiro, numeroCuenta, montoRetiro, cuenta);
+        registrarTransaccion("Retiro en Colones", montoRetiro, numeroCuenta, cuenta);
 
-        return "Estimado usuario: " + cuenta.getNombreCompleto() + ", el monto de este retiro de su cuenta "
-                + numeroCuenta + " es " + montoRetiro + " colones, por favor tome el dinero dispensado.\n\n" +
-                "El monto cobrado por concepto de comisión fue de 0.00 colones, que fueron rebajados automáticamente de su saldo actual";
+        return "<p>Estimado usuario: " + cuenta.getNombreCompleto() + "</p>" +
+                "<p>El monto de este retiro de su cuenta <strong>" + numeroCuenta + "</strong> es de <strong>"
+                + montoRetiro + "</strong> colones, por favor tome el dinero dispensado.</p>" +
+                "<p>El monto cobrado por concepto de comisión fue de <strong>0.00</strong> colones, que fueron rebajados automáticamente de su saldo actual.</p>";
     }
 
     public String realizarRetiroEnDolares(String numeroCuenta, String pin, String palabraIngresada, int montoRetiro) {
@@ -243,16 +259,21 @@ public class TransaccionesControlador {
         if (montoEnColones > cuenta.getSaldo()) {
             return "Error: Fondos insuficientes para realizar el retiro.";
         }
+        boolean comision = (cuenta.getCantidadTransacciones() > 5);
+        Transaccion transaccion = new Transaccion("Retiro en Dólares", montoEnColones, numeroCuenta, comision);
 
-        actualizarSaldoRetiro(cuenta, montoEnColones);
-        registrarTransaccion("Retiro en Dólares", montoRetiro, numeroCuenta, montoEnColones, cuenta);
+        registrarTransaccion("Retiro en Dólares", montoEnColones, numeroCuenta, cuenta);
 
-        return "Estimado usuario: " + cuenta.getNombreCompleto() + "\n" +
-                "El monto de este retiro de su cuenta " + numeroCuenta + " es " + montoRetiro + " dólares.\n" +
-                "Por favor tome el dinero dispensado.\n\n" +
-                "Según el BCCR, el tipo de cambio de venta del dólar de hoy es: " + tipoCambio + "\n" +
-                "El monto equivalente de su retiro es " + montoEnColones + " colones\n" +
-                "El monto cobrado por concepto de comisión fue de 0.00 colones, que fueron rebajados automáticamente de su saldo actual";
+        return "<p>Estimado usuario: " + cuenta.getNombreCompleto() + "</p>" +
+                "<p>El monto de este retiro de su cuenta <strong>" + numeroCuenta + "</strong> es de <strong>"
+                + montoRetiro + "</strong> dólares.</p>" +
+                "<p>Por favor tome el dinero dispensado.</p>" +
+                "<p>Según el BCCR, el tipo de cambio de venta del dólar de hoy es: <strong>" + tipoCambio
+                + "</strong></p>" +
+                "<p>El monto equivalente de su retiro es de <strong>" + montoEnColones + "</strong> colones.</p>" +
+                "<p>El monto cobrado por concepto de comisión fue de <strong>"
+                + transaccion.getMontoComision()
+                + "</strong> colones, que fueron rebajados automáticamente de su saldo actual.</p>";
     }
 
     public String validarCuentaDestino(String numeroCuentaOrigen, String numeroCuentaDestino) {
@@ -313,8 +334,9 @@ public class TransaccionesControlador {
         }
 
         // Calcular comisión si aplica
-        double comision = cuentaOrigen.cantidadTransacciones >= 5 ? montoTransferencia * 0.02 : 0; // Ejemplo de 2% de
-                                                                                                   // comisión
+        double comision = cuentaOrigen.getCantidadTransacciones() >= 5 ? montoTransferencia * 0.02 : 0; // Ejemplo de 2%
+                                                                                                        // de
+        // comisión
         double montoTotalDebitado = montoTransferencia + comision;
 
         // Actualizar saldos
@@ -322,9 +344,9 @@ public class TransaccionesControlador {
         cuentaDestino.setSaldo(cuentaDestino.getSaldo() + montoTransferencia);
 
         // Registrar transacciones
-        registrarTransaccion("Transferencia", montoTransferencia, numeroCuentaDestino, montoTransferencia,
+        registrarTransaccion("Transferencia", montoTransferencia, numeroCuentaDestino,
                 cuentaOrigen);
-        registrarTransaccion("Transferencia", montoTransferencia, numeroCuentaOrigen, montoTransferencia,
+        registrarTransaccion("Transferencia", montoTransferencia, numeroCuentaOrigen,
                 cuentaDestino);
 
         // Guardar cambios en persistencia
@@ -332,16 +354,15 @@ public class TransaccionesControlador {
 
         // Formatear mensaje de respuesta
         String mensaje = String.format(
-                "Estimado usuario: %s, la transferencia de fondos se ejecutó satisfactoriamente.\n" +
-                        "El monto retirado de la cuenta origen %s y depositado en la cuenta destino %s es de %.2f colones.\n"
+                "<p>Estimado usuario: %s, la transferencia de fondos se ejecutó satisfactoriamente.</p>" +
+                        "<p>El monto retirado de la cuenta origen <strong>%s</strong> y depositado en la cuenta destino <strong>%s</strong> es de <strong>%.2f</strong> colones.</p>"
                         +
-                        "[El monto cobrado por concepto de comisión a la cuenta origen fue de %.2f colones, que fueron rebajados automáticamente de su saldo actual]",
+                        "<p>El monto cobrado por concepto de comisión a la cuenta origen fue de <strong>%.2f</strong> colones, que fueron rebajados automáticamente de su saldo actual.</p>",
                 cuentaOrigen.getNombreCompleto(),
                 numeroCuentaOrigen,
                 numeroCuentaDestino,
                 montoTransferencia,
                 comision);
-
         return mensaje;
     }
 
@@ -369,16 +390,29 @@ public class TransaccionesControlador {
         return transacciones;
     }
 
-    private void registrarTransaccion(String tipo, double monto, String numeroCuenta, double montoReal, Cuenta cuenta) {
-        Transaccion transaccion = new Transaccion(tipo, monto, numeroCuenta, false);
-        List<Transaccion> transacciones = cuenta.getTransacciones();
-        transacciones.add(transaccion);
+    private void registrarTransaccion(String tipo, double monto, String numeroCuenta, Cuenta cuenta) {
+        int cantidadTransacciones = cuenta.getCantidadTransacciones() + 1;
+        boolean comision = cantidadTransacciones > 5;
+
+        // Crear la transacción
+        Transaccion transaccion = new Transaccion(tipo, monto, numeroCuenta, comision);
+        cuenta.agregarTransaccion(transaccion);
+
+        // Actualizar el saldo considerando la comisión
+        actualizarSaldo(cuenta, transaccion.getMonto(), transaccion.getMontoComision(), transaccion.getTipo());
         PersistenciaDatos.guardarDatos(clientes);
     }
 
     public boolean validarPinCuenta(String numeroCuenta, String pin) {
+        System.out.println("Verificando PIN para cuenta: " + numeroCuenta);
+        if (clientes == null || clientes.isEmpty()) {
+            System.out.println("No hay clientes registrados.");
+        }
         for (Cliente cliente : clientes) {
+            // System.out.println("Verificando cliente: " + cliente.getNombre());
             for (Cuenta cuenta : cliente.getMisCuentas()) {
+                // System.out.println("Verificando cuenta: " + cuenta.getCodigo());
+                // System.out.println("Verificando PIN: " + cuenta.getPin());
                 if (cuenta.getCodigo().equals(numeroCuenta) && cuenta.verificarPin(pin)) {
                     return true;
                 }

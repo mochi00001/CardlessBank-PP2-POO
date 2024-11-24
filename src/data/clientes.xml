@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<clientes>
+    <cliente tipo="fisico">
+        <fechaNacimiento>1990-01-01</fechaNacimiento>
+        <maxCuentas>3</maxCuentas>
+        <nombre>Juan Perez</nombre>
+        <identificacion>123456789</identificacion>
+        <numTelefono>123456789</numTelefono>
+        <correoElectronico>juanperez@email.com</correoElectronico>
+    </cliente>
+    <cliente tipo="juridico">
+        <tipoNegocio>Comercio</tipoNegocio>
+        <razonSocial>Comercial S.A.</razonSocial>
+        <nombre>Empresa S.A.</nombre>
+        <identificacion>987654321</identificacion>
+        <numTelefono>987654321</numTelefono>
+        <correoElectronico>contacto@empresa.com</correoElectronico>
+    </cliente>
+    <cliente tipo="fisico">
+        <fechaNacimiento>2000-07-31</fechaNacimiento>
+        <maxCuentas>5</maxCuentas>
+        <nombre>Fernanda Sánchez</nombre>
+        <identificacion>305260528</identificacion>
+        <numTelefono>+50687068702</numTelefono>
+        <correoElectronico>sanchzperezf@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="fisico">
+        <fechaNacimiento>2001-07-13</fechaNacimiento>
+        <maxCuentas>5</maxCuentas>
+        <nombre>Luis Steven Madriz</nombre>
+        <identificacion>208190240</identificacion>
+        <numTelefono>89655235</numTelefono>
+        <correoElectronico>luismadriz9@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="juridico">
+        <tipoNegocio>Comercio</tipoNegocio>
+        <razonSocial>Comercio</razonSocial>
+        <nombre>Fersa</nombre>
+        <identificacion>999999999</identificacion>
+        <numTelefono>+50687068702</numTelefono>
+        <correoElectronico>sanchzperezf@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="fisico">
+        <fechaNacimiento>2024-11-01</fechaNacimiento>
+        <maxCuentas>3</maxCuentas>
+        <nombre>Brian Barahona</nombre>
+        <identificacion>201890222</identificacion>
+        <numTelefono>18181818</numTelefono>
+        <correoElectronico>brian@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="juridico">
+        <tipoNegocio>Comercial</tipoNegocio>
+        <razonSocial>Vender equipo deportivo</razonSocial>
+        <nombre>Equipos deportivos</nombre>
+        <identificacion>3432313536</identificacion>
+        <numTelefono>70707070</numTelefono>
+        <correoElectronico>equposdeportivos@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="fisico">
+        <fechaNacimiento>1977-05-09</fechaNacimiento>
+        <maxCuentas>3</maxCuentas>
+        <nombre>Katia Campos</nombre>
+        <identificacion>208190473</identificacion>
+        <numTelefono>88845445</numTelefono>
+        <correoElectronico>katiaC@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="juridico">
+        <tipoNegocio>Comercial</tipoNegocio>
+        <razonSocial>Vender equipos</razonSocial>
+        <nombre>Equipo S.A</nombre>
+        <identificacion>3132333435</identificacion>
+        <numTelefono>20777089</numTelefono>
+        <correoElectronico>esquiposa@gmail.com</correoElectronico>
+    </cliente>
+    <cliente tipo="fisico">
+        <fechaNacimiento>2003-12-12</fechaNacimiento>
+        <maxCuentas>3</maxCuentas>
+        <nombre>Yoiner vega</nombre>
+        <identificacion>105190222</identificacion>
+        <numTelefono>72565235</numTelefono>
+        <correoElectronico>yoinerVega@gmail.com</correoElectronico>
+    </cliente>
+</clientes>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaz Bancaria</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- Menú de navegación -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <img src="images/Logo3.png" alt="Logo de Cajeros Automáticos Cardless" class="logo">
+        </div>
+        <ul class="menu">
+            <li><a href="#" onclick="mostrarSeccion('gestionClientes')">Gestión de Clientes</a>
+                <ul class="submenu">
+                    <li><a href="#" onclick="mostrarSeccion('crearClienteFisico')">Crear Cliente Fisico</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('crearClienteJuridico')">Crear Cliente Jurídico</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('cambiarTelefonoCliente')">Cambiar Teléfono</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('cambiarCorreoCliente')">Cambiar Correo</a></li>
+                </ul>
+            </li>
+            <li><a href="#" onclick="mostrarSeccion('gestionCuentas')">Gestión de Cuentas</a>
+                <ul class="submenu">
+                    <li><a href="#" onclick="mostrarSeccion('crearCuenta')">Crear Cuenta</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('cambiarPin')">Cambiar PIN</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('eliminarCuenta')">Eliminar Cuenta</a></li>
+                </ul>
+            </li>
+            <li><a href="#" onclick="mostrarSeccion('operacionesFinancieras')">Operaciones Financieras</a>
+                <ul class="submenu">
+                    <li><a href="#" onclick="mostrarSeccion('depositoColones')">Depósito en Colones</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('depositoDolares')">Depósito en Dólares</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('retiroColones')">Retiro en Colones</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('retiroDolares')">Retiro en Dólares</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('transferencia')">Transferencia</a></li>
+                </ul>
+            </li>
+            <li><a href="#" onclick="mostrarSeccion('consultasReportes')">Consultas y Reportes</a>
+                <ul class="submenu">
+                    <li><a href="#" onclick="mostrarSeccion('consultarTransacciones')">Consultar Transacciones</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarTipoCambioCompra')">Tipo de Cambio Compra</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarTipoCambioVenta')">Tipo de Cambio Venta</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarSaldoActual')">Saldo Actual</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarSaldoDolares')">Saldo en Dólares</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarEstadoDeCuenta')">Estado de Cuenta</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarEstatusDeCuenta')">Estatus de Cuenta</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarCuentasDeCliente')">Cuentas del Cliente</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarClientesRegistrados')">Clientes Registrados</a></li>
+                    <li><a href="#" onclick="mostrarSeccion('consultarCuentasRegistradas')">Cuentas Registradas</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Contenedores de contenido de cada sección -->
+    <div id="contenido">
+        <section id="gestionClientes" class="contenido">Gestión de Clientes</section>
+        <section id="gestionCuentas" class="contenido">Gestión de Cuentas</section>
+        <section id="operacionesFinancieras" class="contenido">Operaciones Financieras</section>
+        <section id="consultasReportes" class="contenido">Consultas y Reportes</section>
+        
+        <!-- Sub-secciones específicas -->
+
+        <!-- Sección para Gestion de Clientes -->
+        
+        <!-- Sección para crear cliente físico -->
+        <section id="crearClienteFisico" class="contenido">
+            <h2>Crear Cliente Físico</h2>
+            <form id="formClienteFisico" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="nombreFisico">Nombre Completo:</label>
+                    <input type="text" id="nombreFisico" placeholder="Nombre Completo" required>
+                </div>
+        
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoriaFisico">Categoría:</label>
+                        <select id="categoriaFisico">
+                            <option value="Estándar">Estándar</option>
+                            <option value="Premium">Premium</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefonoFisico">Número de Teléfono:</label>
+                        <input type="text" id="telefonoFisico" placeholder="Teléfono" required>
+                    </div>
+                </div>
+        
+                <div class="form-group">
+                    <label for="correoFisico">Correo Electrónico:</label>
+                    <input type="email" id="correoFisico" placeholder="Correo Electrónico" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="identificacionFisico">Identificación:</label>
+                    <input type="text" id="identificacionFisico" placeholder="Identificación" required>
+                </div>
+        
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maxCuentasFisico">Máximo de Cuentas:</label>
+                        <input type="number" id="maxCuentasFisico" placeholder="Cantidad máxima de cuentas" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaNacimientoFisico">Fecha de Nacimiento:</label>
+                        <input type="date" id="fechaNacimientoFisico" required>
+                    </div>
+                </div>
+        
+                <button type="submit">Crear Cliente Físico</button>
+            </form>
+            <div id="resultadoClienteFisico" style="display: none; margin-top: 1em;">
+                <p id="mensajeClienteFisico"></p>
+            </div>
+        </section>
+
+
+        <!-- Sección para crear cliente jurídico -->
+        <section id="crearClienteJuridico" class="contenido">
+            <h2>Crear Cliente Jurídico</h2>
+            <form id="formClienteJuridico">
+                <div class="form-group">
+                    <label for="nombreJuridico">Nombre del Apoderado Generalísimo:</label>
+                    <input type="text" id="nombreJuridico" placeholder="Nombre Completo" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoriaJuridico">Categoría:</label>
+                        <select id="categoriaJuridico">
+                            <option value="Estándar">Estándar</option>
+                            <option value="Premium">Premium</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefonoJuridico">Número de Teléfono:</label>
+                        <input type="text" id="telefonoJuridico" placeholder="Teléfono" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="correoJuridico">Correo Electrónico:</label>
+                    <input type="email" id="correoJuridico" placeholder="Correo Electrónico" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoNegocio">Tipo de Negocio:</label>
+                    <input type="text" id="tipoNegocio" placeholder="Tipo de Negocio" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cedulaJuridica">Cédula Jurídica:</label>
+                        <input type="text" id="cedulaJuridica" placeholder="Cédula Jurídica" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="razonSocial">Razón Social:</label>
+                        <input type="text" id="razonSocial" placeholder="Razón Social" required>
+                    </div>
+                </div>
+
+                <button type="submit">Crear Cliente Jurídico</button>
+            </form>
+            <div id="resultadoClienteJuridico" style="display: none; margin-top: 1em;">
+                <p id="mensajeClienteJuridico"></p>
+            </div>
+        </section>
+
+
+
+        <!-- Sección para cambiar el número de teléfono de un cliente -->
+        <section id="cambiarTelefonoCliente" class="contenido">
+            <h2>Cambiar Número de Teléfono</h2>
+            <form id="formCambiarTelefono" onsubmit="return false;">
+                <label for="identificacionTelefonoCliente">Identificación del Cliente:</label>
+                <input type="text" id="identificacionTelefonoCliente" placeholder="Ingrese la identificación" required>
+                <button type="button">Validar Identificación</button>
+        
+                <!-- Información del cliente validado -->
+                <div id="infoClienteTelefono" style="display: none; margin-top: 1em;">
+                    <p id="datosClienteTelefono"></p>
+                </div>
+        
+                <!-- Campos adicionales que se muestran después de validar la identificación -->
+                <div id="camposCambioTelefono" style="display: none;">
+                    <label for="nuevoTelefono">Nuevo Número de Teléfono:</label>
+                    <input type="text" id="nuevoTelefono" placeholder="Ingrese el nuevo número de teléfono" required>
+        
+                    <button type="button">Cambiar Número de Teléfono</button>
+                </div>
+            </form>
+        
+            <div id="resultadoCambioTelefono" style="display: none; margin-top: 1em;">
+                <p id="mensajeCambioTelefono"></p>
+            </div>
+        </section>        
+
+        <!-- Sección para cambiar el correo electrónico de un cliente -->
+        <section id="cambiarCorreoCliente" class="contenido">
+            <h2>Cambiar Dirección de Correo Electrónico</h2>
+            <form id="formCambiarCorreo" onsubmit="return false;">
+                <label for="identificacionCorreoCliente">Identificación del Cliente:</label>
+                <input type="text" id="identificacionCorreoCliente" placeholder="Ingrese la identificación" required>
+                <button type="button">Validar Identificación</button>
+        
+                <!-- Información del cliente validado -->
+                <div id="infoClienteCorreo" style="display: none; margin-top: 1em;">
+                    <p id="datosClienteCorreo"></p>
+                </div>
+
+                <!-- Campos adicionales que se muestran después de validar la identificación -->
+                <div id="camposCambioCorreo" style="display: none;">
+                    <label for="nuevoCorreo">Nueva Dirección de Correo Electrónico:</label>
+                    <input type="email" id="nuevoCorreo" placeholder="Ingrese el nuevo correo electrónico" required>
+
+                    <button type="button" id="btnCambiarCorreo">Cambiar Correo Electrónico</button>
+                </div>
+            </form>
+        
+            <div id="resultadoCambioCorreo" style="display: none; margin-top: 1em;">
+                <p id="mensajeCambioCorreo"></p>
+            </div>
+        </section>
+        
+
+        <!-- Sección para Gestion de Cuentas -->
+
+        <!-- Sección para crear una cuenta -->
+        <section id="crearCuenta" class="contenido">
+            <h2>Crear Cuenta</h2>
+            <form id="formCrearCuenta" onsubmit="return false;">
+                <!-- Solicitar Identidad del Cliente -->
+                <div class="form-group">
+                    <label for="identificacionCliente">Identificación del Cliente (Física o Jurídica):</label>
+                    <input type="text" id="identificacionCliente" placeholder="Identificación o Cédula Jurídica" required>
+                    <button type="button" id="btnValidarCliente">Validar Cliente</button>
+                </div>
+
+                <!-- Mostrar Datos del Cliente si es válido -->
+                <div id="datosClienteCuenta" style="display: none; margin-top: 1em;">
+                    <h3>Datos del Cliente:</h3>
+                    <p id="infoClienteCuenta"></p>
+                </div>
+
+                <!-- Campos adicionales que se muestran después de validar el cliente -->
+                <div id="camposCrearCuenta" style="display: none; margin-top: 1em;">
+                    <!-- Solicitar PIN -->
+                    <div class="form-group">
+                        <label for="pinCuenta">PIN de la Cuenta:</label>
+                        <input type="password" id="pinCuenta" placeholder="PIN (debe tener entre 4 y 6 dígitos)" required pattern="\\d{4,6}">
+                    </div>
+
+                    <!-- Solicitar Monto de Depósito Inicial -->
+                    <div class="form-group">
+                        <label for="depositoInicial">Monto del Depósito Inicial (sin decimales):</label>
+                        <input type="number" id="depositoInicial" placeholder="Depósito Inicial" min="0" step="1" required>
+                    </div>
+
+                    <button type="button" id="btnCrearCuenta">Crear Cuenta</button>
+                </div>
+            </form>
+
+            <div id="resultadoCrearCuenta" style="display: none; margin-top: 1em;">
+                <p id="mensajeCrearCuenta"></p>
+            </div>
+        </section>
+
+        <!-- Sección para cambiar el PIN -->
+        <section id="cambiarPin" class="contenido">
+            <h2>Cambiar PIN</h2>
+            <form id="formCambiarPin" onsubmit="return false;">
+                <label for="numeroCuenta">Número de Cuenta:</label>
+                <input type="text" id="numeroCuenta" placeholder="Ingrese el número de cuenta" required>
+                <button type="button" id="btnValidarCuentaPin">Validar Cuenta</button>
+
+                <!-- Información de la cuenta validada -->
+                <div id="infoCuentaPin" style="display: none; margin-top: 1em;">
+                    <h3>Datos de la Cuenta:</h3>
+                    <p id="datosCuentaPin"></p>
+                </div>
+
+                <!-- Campos adicionales que se muestran después de validar la cuenta -->
+                <div id="camposCambioPin" style="display: none; margin-top: 1em;">
+                    <label for="pinActual">PIN Actual:</label>
+                    <input type="password" id="pinActual" placeholder="Ingrese el PIN actual" required>
+
+                    <label for="nuevoPin">Nuevo PIN:</label>
+                    <input type="password" id="nuevoPin" placeholder="Ingrese el nuevo PIN" required>
+
+                    <button type="button" id="btnCambiarPin">Cambiar PIN</button>
+                </div>
+            </form>
+
+            <div id="resultadoCambioPin" style="display: none; margin-top: 1em;">
+                <p id="mensajeCambioPin"></p>
+            </div>
+        </section>
+
+        <!-- Sección para eliminar una cuenta -->
+        <section id="eliminarCuenta" class="contenido">
+            <h2>Eliminar Cuenta</h2>
+            <form id="formEliminarCuenta" onsubmit="return false;">
+                <label for="numeroCuentaEliminar">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaEliminar" placeholder="Ingrese el número de cuenta" required>
+
+                <label for="pinCuentaEliminar">PIN de la Cuenta:</label>
+                <input type="password" id="pinCuentaEliminar" placeholder="Ingrese el PIN" required>
+
+                <button type="button" id="btnValidarCuentaEliminar">Validar Cuenta</button>
+            </form>
+
+            <!-- Mensaje de confirmación antes de eliminar -->
+            <div id="mensajeConfirmacionEliminacion" style="display: none; margin-top: 1em;">
+                <p id="mensajeCuentaEliminar"></p>
+                <button type="button" id="btnConfirmarEliminacion">Sí, eliminar la cuenta</button>
+                <button type="button" id="btnCancelarEliminacion">Cancelar</button>
+            </div>
+
+            <!-- Resultado de la eliminación -->
+            <div id="resultadoEliminacionCuenta" style="display: none; margin-top: 1em;">
+                <p id="mensajeResultadoEliminacion"></p>
+            </div>
+        </section>
+
+
+        <!-- Sección para Operaciones Financieras -->
+
+        <!-- Sección para Depósito en Colones -->
+        <section id="depositoColones" class="contenido">
+            <h2>Depósito en Colones</h2>
+            <form id="formDepositoColones" onsubmit="return false;">
+                <!-- Solicitar Número de Cuenta -->
+                <label for="numeroCuentaDepositoColones">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaDepositoColones" placeholder="Ingrese el número de cuenta" required>
+                <button type="button" id="btnValidarCuentaDepositoColones">Validar Cuenta</button>
+
+                <!-- Mensaje de validación de la cuenta -->
+                <div id="mensajeValidacionCuentaDepositoColones" style="display: none; margin-top: 0.5em;"></div>
+
+                <!-- Campos adicionales tras validar la cuenta -->
+                <div id="camposDepositoColones" style="display: none; margin-top: 1em;">
+                    <!-- Solicitar Monto del Depósito -->
+                    <label for="montoDepositoColones">Monto del Depósito (₡):</label>
+                    <input type="number" id="montoDepositoColones" placeholder="Monto sin decimales" min="1" step="1" required>
+
+                    <!-- Botón para Realizar Depósito -->
+                    <button type="button" id="btnRealizarDepositoColones">Depositar</button>
+
+                    <!-- Mensaje de error al realizar el depósito -->
+                    <div id="mensajeErrorDepositoColones" style="color: red; margin-top: 0.5em;"></div>
+                </div>
+            </form>
+
+            <!-- Resultado del Depósito -->
+            <div id="resultadoDepositoColones" style="display: none; margin-top: 1em;">
+                <p id="mensajeDepositoColones"></p>
+            </div>
+        </section>
+
+
+
+        
+        <!-- Sección para Depósito en Dólares -->
+        <section id="depositoDolares" class="contenido">
+            <h2>Depósito en Dólares</h2>
+            <form id="formDepositoDolares" onsubmit="return false;">
+                <!-- Solicitar Número de Cuenta -->
+                <label for="numeroCuentaDepositoDolares">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaDepositoDolares" placeholder="Ingrese el número de cuenta" required>
+                <button type="button" id="btnValidarCuentaDepositoDolares">Validar Cuenta</button>
+
+                <!-- Mensaje de validación de la cuenta -->
+                <div id="mensajeValidacionCuentaDepositoDolares" style="display: none; margin-top: 0.5em;"></div>
+
+                <!-- Campos adicionales tras validar la cuenta -->
+                <div id="camposDepositoDolares" style="display: none; margin-top: 1em;">
+                    <!-- Solicitar Monto del Depósito en Dólares -->
+                    <label for="montoDepositoDolares">Monto del Depósito (USD):</label>
+                    <input type="number" id="montoDepositoDolares" placeholder="Monto sin decimales" min="1" step="1" required>
+
+                    <!-- Botón para Realizar Depósito -->
+                    <button type="button" id="btnRealizarDepositoDolares">Depositar</button>
+
+                    <!-- Mensaje de error al realizar el depósito -->
+                    <div id="mensajeErrorDepositoDolares" style="display: none; margin-top: 0.5em;"></div>
+                </div>
+            </form>
+
+            <!-- Resultado del Depósito -->
+            <div id="resultadoDepositoDolares" style="display: none; margin-top: 1em;">
+                <p id="mensajeDepositoDolares"></p>
+            </div>
+        </section>
+
+
+        
+        <!-- Sección para Retiro en Colones -->
+        <section id="retiroColones" class="contenido">
+            <h2>Retiro en Colones</h2>
+            <form id="formRetiroColones" onsubmit="return false;">
+                <!-- Solicitar Número de Cuenta -->
+                <label for="numeroCuentaRetiroColones">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaRetiroColones" placeholder="Ingrese el número de cuenta" required>
+
+                <!-- Solicitar PIN de la Cuenta -->
+                <label for="pinRetiroColones">PIN de la Cuenta:</label>
+                <input type="password" id="pinRetiroColones" placeholder="Ingrese el PIN" required>
+
+                <button type="button" id="btnValidarCuentaRetiroColones">Validar Cuenta</button>
+            </form>
+
+            <!-- Verificación de Palabra Clave -->
+            <div id="verificacionPalabraRetiroColones" style="display: none; margin-top: 1em;">
+                <label>Se ha enviado una palabra por mensaje de texto. Por favor, ingrésela a continuación.</label>
+                <label for="palabraClaveRetiroColones">Palabra Clave:</label>
+                <input type="text" id="palabraClaveRetiroColones" placeholder="Ingrese la palabra" required>
+                <button type="button" id="btnValidarPalabraClaveRetiroColones">Verificar Palabra</button>
+            </div>
+
+            <!-- Solicitud de Monto de Retiro -->
+            <div id="campoMontoRetiroColones" style="display: none; margin-top: 1em;">
+                <label for="montoRetiroColones">Monto a Retirar (₡):</label>
+                <input type="number" id="montoRetiroColones" placeholder="Monto sin decimales" min="1" step="1" required>
+                <button type="button" id="btnRealizarRetiroColones">Retirar</button>
+            </div>
+
+            <!-- Resultado del Retiro -->
+            <div id="resultadoRetiroColones" style="display: none; margin-top: 1em;">
+                <p id="mensajeRetiroColones"></p>
+            </div>
+        </section>
+
+
+
+            <!-- Resultado del Retiro -->
+            <div id="resultadoRetiroColones" style="display: none; margin-top: 1em;">
+                <p id="mensajeRetiroColones"></p>
+            </div>
+        </section>
+        
+        <!-- Sección para Retiro en Dólares -->
+        <section id="retiroDolares" class="contenido">
+            <h2>Retiro en Dólares</h2>
+            <form id="formRetiroDolares" onsubmit="return false;">
+                <!-- Solicitar Número de Cuenta -->
+                <label for="numeroCuentaRetiroDolares">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaRetiroDolares" placeholder="Ingrese el número de cuenta" required>
+
+                <!-- Solicitar PIN de la Cuenta -->
+                <label for="pinRetiroDolares">PIN de la Cuenta:</label>
+                <input type="password" id="pinRetiroDolares" placeholder="Ingrese el PIN" required>
+
+                <button type="button" id="btnValidarCuentaRetiroDolares">Validar Cuenta</button>
+            </form>
+
+            <!-- Mensajes dentro del formulario -->
+            <div id="mensajeValidacionCuentaRetiroDolares" style="color: red; margin-top: 0.5em;"></div>
+
+            <!-- Verificación de Palabra Clave -->
+            <div id="verificacionPalabraRetiroDolares" style="display: none; margin-top: 1em;">
+                <p id="mensajeEnvioPalabraDolares"></p>
+                <label for="palabraClaveRetiroDolares">Palabra Clave:</label>
+                <input type="text" id="palabraClaveRetiroDolares" placeholder="Ingrese la palabra" required>
+                <button type="button" id="btnValidarPalabraClaveRetiroDolares">Verificar Palabra</button>
+                <div id="mensajeValidacionPalabraRetiroDolares" style="color: red; margin-top: 0.5em;"></div>
+            </div>
+
+            <!-- Solicitud de Monto de Retiro -->
+            <div id="campoMontoRetiroDolares" style="display: none; margin-top: 1em;">
+                <label for="montoRetiroDolares">Monto a Retirar (USD):</label>
+                <input type="number" id="montoRetiroDolares" placeholder="Monto sin decimales" min="1" step="1" required>
+                <button type="button" id="btnRealizarRetiroDolares">Retirar</button>
+                <div id="mensajeErrorRetiroDolares" style="color: red; margin-top: 0.5em;"></div>
+            </div>
+
+            <!-- Resultado del Retiro -->
+            <div id="resultadoRetiroDolares" style="display: none; margin-top: 1em;">
+                <p id="mensajeRetiroDolares"></p>
+            </div>
+        </section>
+
+
+
+        
+        <!-- Sección para Transferencia -->
+        <section id="transferencia" class="contenido">
+            <h2>Transferencia entre Cuentas del Mismo Dueño</h2>
+            <form id="formTransferencia" onsubmit="return false;">
+                <!-- Solicitar Número de Cuenta Origen -->
+                <label for="numeroCuentaOrigen">Número de Cuenta Origen:</label>
+                <input type="text" id="numeroCuentaOrigen" placeholder="Ingrese el número de cuenta origen" required>
+
+                <!-- Solicitar PIN de la Cuenta Origen -->
+                <label for="pinCuentaOrigen">PIN de la Cuenta Origen:</label>
+                <input type="password" id="pinCuentaOrigen" placeholder="Ingrese el PIN" required>
+
+                <button type="button" id="btnValidarCuentaOrigen">Validar Cuenta Origen</button>
+
+                <!-- Mensaje de validación de cuenta origen -->
+                <div id="mensajeValidacionCuentaOrigen" style="color: red; margin-top: 0.5em;"></div>
+
+                <!-- Verificación de Palabra Clave -->
+                <div id="verificacionPalabraTransferencia" style="display: none; margin-top: 1em;">
+                    <p id="mensajeEnvioPalabraTransferencia"></p>
+                    <label for="palabraClaveTransferencia">Palabra Clave:</label>
+                    <input type="text" id="palabraClaveTransferencia" placeholder="Ingrese la palabra" required>
+                    <button type="button" id="btnValidarPalabraClaveTransferencia">Verificar Palabra</button>
+                    <div id="mensajeValidacionPalabraTransferencia" style="color: red; margin-top: 0.5em;"></div>
+                </div>
+
+                <!-- Solicitud de Monto y Cuenta Destino -->
+                <div id="camposMontoYDestino" style="display: none; margin-top: 1em;">
+                    <!-- Monto a Transferir -->
+                    <label for="montoTransferencia">Monto a Transferir (₡):</label>
+                    <input type="number" id="montoTransferencia" placeholder="Monto sin decimales" min="1" step="1" required>
+
+                    <!-- Número de Cuenta Destino -->
+                    <label for="numeroCuentaDestino">Número de Cuenta Destino:</label>
+                    <input type="text" id="numeroCuentaDestino" placeholder="Ingrese el número de cuenta destino" required>
+
+                    <button type="button" id="btnValidarCuentaDestino">Validar Cuenta Destino</button>
+
+                    <!-- Mensaje de validación de cuenta destino -->
+                    <div id="mensajeValidacionCuentaDestino" style="color: red; margin-top: 0.5em;"></div>
+                </div>
+
+                <!-- Botón para Realizar Transferencia -->
+                <div id="botonTransferir" style="display: none; margin-top: 1em;">
+                    <button type="button" id="btnRealizarTransferencia">Transferir</button>
+                    <div id="mensajeErrorTransferencia" style="color: red; margin-top: 0.5em;"></div>
+                </div>
+            </form>
+
+            <!-- Resultado de la Transferencia -->
+            <div id="resultadoTransferencia" style="display: none; margin-top: 1em;">
+                <p id="mensajeTransferencia"></p>
+            </div>
+        </section>
+
+
+
+        <!-- Sección para Consultas y Reportes -->
+
+        <!-- Sección para consultar transacciones de una cuenta -->
+        <section id="consultarTransacciones" class="contenido">
+            <h2>Consultar Transacciones Realizadas en una Cuenta</h2>
+            
+            <!-- Formulario para ingresar cuenta y PIN -->
+            <form id="formTransacciones" onsubmit="return false;">
+                <label for="numeroCuentaTransacciones">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaTransacciones" placeholder="Ingrese el número de cuenta" required>
+                
+                <label for="pinCuentaTransacciones">PIN de la Cuenta:</label>
+                <input type="password" id="pinCuentaTransacciones" placeholder="Ingrese el PIN" required>
+
+                <button type="button" id="btnValidarCuentaTransacciones">Validar Cuenta</button>
+            </form>
+
+            <!-- Sección de verificación de palabra clave -->
+            <div id="verificacionPalabraTransacciones" style="display: none; margin-top: 1em;">
+                <p id="mensajeEnvioPalabraTransacciones"></p>
+                <label for="palabraClaveTransacciones">Ingrese la palabra recibida:</label>
+                <input type="text" id="palabraClaveTransacciones" placeholder="Ingrese la palabra" required>
+                <button type="button" id="btnValidarPalabraClaveTransacciones">Verificar</button>
+            </div>
+
+            <!-- Sección de resultados de transacciones -->
+            <div id="resultadoTransacciones" style="display: none; margin-top: 1em;">
+                <h3>Historial de Transacciones</h3>
+                <p id="mensajeTransacciones"></p>
+                
+                <table id="tablaTransacciones">
+                    <thead>
+                        <tr>
+                            <th>Tipo de Transacción</th>
+                            <th>Monto</th>
+                            <th>Fecha</th>
+                            <th>Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se mostrarán las transacciones de la cuenta -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+
+        <!-- Sección para consultar tipo de cambio de compra -->
+        <section id="consultarTipoCambioCompra" class="contenido">
+            <h2>Consultar Tipo de Cambio de Compra</h2>
+            <div id="resultadoTipoCambioCompra" style="display: none; margin-top: 1em;">
+                <p id="mensajeTipoCambioCompra"></p>
+            </div>
+        </section>
+
+        <!-- Sección para consultar tipo de cambio de venta -->
+        <section id="consultarTipoCambioVenta" class="contenido">
+            <h2>Consultar Tipo de Cambio de Venta</h2>
+            <div id="resultadoTipoCambioVenta" style="display: none; margin-top: 1em;">
+                <p id="mensajeTipoCambioVenta"></p>
+            </div>
+        </section>
+
+
+        <!-- Sección para consultar saldo actual en colones -->
+        <section id="consultarSaldoActual" class="contenido">
+            <h2>Consultar Saldo Actual en Colones</h2>
+            <form id="formSaldoColones" onsubmit="return false;">
+                <label for="numeroCuentaColones">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaColones" placeholder="Ingrese el número de cuenta" required>
+
+                <label for="pinCuentaColones">PIN de la Cuenta:</label>
+                <input type="password" id="pinCuentaColones" placeholder="Ingrese el PIN" required>
+
+                <button type="button">Consultar</button>
+                
+                <div id="resultadoSaldoColones" style="display: none; margin-top: 1em;">
+                    <p id="mensajeSaldoColones"></p>
+                </div>
+            </form>
+        </section>
+
+        <!-- Sección para consultar saldo actual en dólares -->
+        <section id="consultarSaldoDolares" class="contenido">
+            <h2>Consultar Saldo Actual en Dólares</h2>
+            <form id="formSaldoDolares" onsubmit="return false;">
+                <label for="numeroCuentaDolares">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaDolares" placeholder="Ingrese el número de cuenta" required>
+
+                <label for="pinCuentaDolares">PIN de la Cuenta:</label>
+                <input type="password" id="pinCuentaDolares" placeholder="Ingrese el PIN" required>
+
+                <button type="button">Consultar</button>
+            
+                <div id="resultadoSaldoDolares" style="display: none; margin-top: 1em;">
+                    <p id="mensajeSaldoDolares"></p>
+                </div>
+            </form>
+        </section>
+
+        <!-- Sección para consultar el estado de cuenta -->
+        <section id="consultarEstadoDeCuenta" class="contenido">
+            <h2>Consultar Estado de Cuenta</h2>
+            <form id="formEstadoCuenta" onsubmit="return false;">
+                <label for="numeroCuentaEstado">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaEstado" placeholder="Ingrese el número de cuenta" required>
+
+                <label for="pinCuentaEstado">PIN de la Cuenta:</label>
+                <input type="password" id="pinCuentaEstado" placeholder="Ingrese el PIN" required>
+
+                <button type="button" id="btnConsultarEstadoCuenta">Consultar</button>
+            </form>
+            
+            <div id="resultadoEstadoCuenta" style="display: none; margin-top: 1em;">
+                <h3>Estado de Cuenta</h3>
+                <p id="datosCuentaEstado"></p>
+            </div>
+        </section>
+
+
+
+        <!-- Sección para consultar el estatus de una cuenta -->
+        <section id="consultarEstatusDeCuenta" class="contenido">
+            <h2>Consultar Estatus de una Cuenta</h2>
+            <form id="formConsultaCuenta" onsubmit="return false;">
+                <label for="numeroCuentaEstatus">Número de Cuenta:</label>
+                <input type="text" id="numeroCuentaEstatus" placeholder="Ingrese el número de cuenta" required>
+                <button type="button">Consultar</button>
+            </form>
+            
+            <div id="resultadoCuenta" style="display: none; margin-top: 1em;">
+                <p id="datosCuenta"></p>
+            </div>
+        </section>
+
+        <!-- Sección para consultar cuentas de un cliente -->
+        <section id="consultarCuentasDeCliente" class="contenido">
+            <h2>Consultar Cuentas del Cliente</h2>
+            <form id="formConsultaCliente" onsubmit="return false;">
+                <label for="identificacionClienteCuentas">Identificación del Cliente:</label>
+                <input type="text" id="identificacionClienteCuentas" placeholder="Ingrese la identificación" required>
+                <button type="button" id="btnConsultarCuentasCliente">Consultar</button>
+                
+                <div id="resultadoCliente" style="display: none; margin-top: 1em;">
+                    <h3>Información del Cliente</h3>
+                    <p id="datosCliente"></p>
+    
+                    <h3>Cuentas y Saldos</h3>
+                    <table id="tablaCuentasCliente">
+                        <thead>
+                            <tr>
+                                <th>Número de Cuenta</th>
+                                <th>Saldo Actual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí se mostrarán las cuentas del cliente -->
+                        </tbody>
+                    </table>
+                </div>
+                
+            </form>
+
+        </section>
+
+
+
+        <!-- Nueva sección para mostrar los clientes registrados -->
+        <section id="consultarClientesRegistrados" class="contenido">
+            <h2>Clientes Registrados</h2>
+            <table id="tablaClientesRegistrados">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo de Cliente</th>
+                        <th>Identificación</th>
+                        <th>Correo Electrónico</th>
+                        <th>Teléfono</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Las filas de datos se agregarán dinámicamente desde JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Nueva sección para mostrar las cuentas registradas -->
+        <section id="consultarCuentasRegistradas" class="contenido">
+            <h2>Cuentas Registradas</h2>
+            <table id="tablaCuentasRegistradas">
+                <thead>
+                    <tr>
+                        <th>Número de Cuenta</th>
+                        <th>Estatus</th>
+                        <th>Nombre del Dueño o Apoderado</th>
+                        <th>Saldo Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Las filas de datos se agregarán dinámicamente desde JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Cajeros Automáticos Cardless. Todos los derechos reservados.</p>
+            <p>Creado por: Luis Madriz, Jossue Mora, Fernanda Sánchez, Sergio Trigueros</p>
+            <ul class="footer-links">
+                <li><a href="#">Política de Privacidad</a></li>
+                <li><a href="#">Términos de Uso</a></li>
+                <li><a href="#">Preferencias de Cookies</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+
+
+</html>
